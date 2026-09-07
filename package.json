@@ -20,10 +20,16 @@
     "lint": "eslint . --max-warnings 0",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "test": "vitest run",
+    "test": "pnpm test:unit && pnpm test:integration",
     "test:unit": "vitest run --config vitest.config.ts",
     "test:coverage": "vitest run --coverage",
-    "test:integration": "vitest run --config vitest.workers.config.ts"
+    "test:integration": "vitest run --config vitest.workers.config.ts",
+    "storybook": "storybook dev -p 6006 --no-open --disable-telemetry",
+    "storybook:build": "storybook build --disable-telemetry",
+    "test:stories": "vitest run --config vitest.storybook.config.ts",
+    "test:e2e": "pnpm build && playwright test",
+    "check": "pnpm typecheck && pnpm lint && pnpm format:check && pnpm test:unit && pnpm test:integration",
+    "verify": "pnpm check && pnpm test:coverage && pnpm test:e2e && pnpm storybook:build && pnpm test:stories"
   },
   "dependencies": {
     "@headlessui/react": "2.2.10",

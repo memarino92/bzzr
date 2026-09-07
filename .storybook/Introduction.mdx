@@ -1,0 +1,37 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+
+<Meta title="Start here" />
+
+# bzzr
+
+This is the component workshop for a realtime trivia buzzer.
+
+Start with **Pages → Room → Play A Round**: open buzzing, press the buzzer,
+then reset. This story runs locally with deterministic data. Real rooms use
+Cloudflare Durable Objects; stories never create rooms or contact production.
+
+## Explore the states
+
+- **Game / Buzzer**: ready, waiting, sending, first, later, disconnected.
+- **Game / Entry form**: host, code entry, direct invitation, busy, errors.
+- **Pages / Room**: host and player perspectives, results, lock, host absence,
+  reconnecting, failed connection, long names, a full 60-person room.
+- **Pages / Room notice**: loading, ended, expired, error, and missing page.
+- **Pages / Home**: the actual landing page and entry form.
+
+## Design rules
+
+All styles use Tailwind CSS. Colors follow the operating system's light/dark
+preference. The buzzer is a native button: Tab to focus, then Space or Enter.
+Live regions announce connection feedback and first buzz. Color is reinforced
+with text. The server always owns order; no story should imply a client can
+choose its place.
+
+The copied Catalyst primitives remain under the Tailwind Plus license.
+These stories document bzzr as an application, not a redistributable UI kit.
+
+## Quality checks
+
+The Vitest Storybook addon executes interactions in Chromium, with the
+accessibility addon configured to fail on violations. Run
+`pnpm test:stories`. Run `pnpm test:e2e` for real multi-browser rooms.

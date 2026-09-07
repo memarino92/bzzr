@@ -334,3 +334,91 @@ describe("room Worker and Durable Object", () => {
     expect(state?.players[0]?.name).toBe("Alex");
   });
 });
+
+describe("resource bounds and transport health", () => {
+  it("enforces the seat cap under concurrent joins", async () => {
+    const host = await create();
+    const stub = env.ROOMS.getByName(host.code);
+    const results = await Promise.all(
+      Array.from({ length: 75 }, (_, i) =>
+        stub.fetch(
+          new Request("https://room.internal/join", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "x-bzzr-token-hash": i.toString(16).padStart(64, "0"),
+            },
+            body: JSON.stringify({ name: "Player " + i }),
+          }),
+        ),
+      ),
+    );
+    expect(results.filter((r) => r.status === 200)).toHaveLength(59);
+    expect(results.filter((r) => r.status === 409)).toHaveLength(16);
+    const state = await runInDurableObject(stub, (_instance, ctx) =>
+      ctx.storage.get<RoomState>("room"),
+    );
+    expect(state?.players).toHaveLength(60);
+  });
+  it("closes a command flood", async () => {
+    const host = await create();
+    const h = await connect(host.code, host.cookie);
+    const closed = new Promise<number>((resolve) =>
+      h.ws.addEventListener("close", (event) => resolve(event.code)),
+    );
+    for (let i = 0; i <= LIMITS.messagesPerWindow; i++)
+      h.send({ type: "invalid" });
+    expect(await closed).toBe(1008);
+  });
+  it("rejects binary command frames", async () => {
+    const host = await create();
+    const h = await connect(host.code, host.cookie);
+    const closed = new Promise<number>((resolve) =>
+      h.ws.addEventListener("close", (event) => resolve(event.code)),
+    );
+    h.ws.send(new Uint8Array([1, 2, 3]).buffer);
+    expect(await closed).toBe(1009);
+  });
+  it("answers heartbeat messages without changing the expiry alarm", async () => {
+    const host = await create();
+    const h = await connect(host.code, host.cookie);
+    const stub = env.ROOMS.getByName(host.code);
+    const before = await runInDurableObject(stub, (_instance, ctx) =>
+      ctx.storage.getAlarm(),
+    );
+    const pong = new Promise<string>((resolve) =>
+      h.ws.addEventListener("message", (event) => {
+        if (event.data === "pong") resolve("pong");
+      }),
+    );
+    h.ws.send("ping");
+    expect(await pong).toBe("pong");
+    expect(
+      await runInDurableObject(stub, (_instance, ctx) =>
+        ctx.storage.getAlarm(),
+      ),
+    ).toBe(before);
+  });
+  it("throttles room creation by edge IP key", async () => {
+    const key = crypto.randomUUID();
+    for (let i = 0; i < 10; i++)
+      expect(
+        (
+          await api("/api/rooms", {
+            method: "POST",
+            headers: { "CF-Connecting-IP": key },
+            body: '{"name":"Alex"}',
+          })
+        ).status,
+      ).toBe(201);
+    expect(
+      (
+        await api("/api/rooms", {
+          method: "POST",
+          headers: { "CF-Connecting-IP": key },
+          body: '{"name":"Alex"}',
+        })
+      ).status,
+    ).toBe(429);
+  });
+});
