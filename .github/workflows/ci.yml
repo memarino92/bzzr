@@ -32,7 +32,7 @@ jobs:
       - run: pnpm format:check
       - run: pnpm test:coverage
       - run: pnpm test:integration
-      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         if: always()
         with:
           name: coverage
@@ -55,7 +55,7 @@ jobs:
       - run: pnpm test:e2e
       - run: pnpm storybook:build
       - run: pnpm test:stories
-      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         if: always()
         with:
           name: browser-reports
@@ -63,7 +63,7 @@ jobs:
             playwright-report/
             test-results/
           retention-days: 14
-      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: storybook
           path: storybook-static/
