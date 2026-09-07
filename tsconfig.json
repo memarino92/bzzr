@@ -5,7 +5,12 @@
     "jsx": "react-jsx",
     "module": "ESNext",
     "moduleResolution": "bundler",
-    "types": ["./worker-configuration.d.ts", "vite/client", "node"],
+    "types": [
+      "./worker-configuration.d.ts",
+      "vite/client",
+      "node",
+      "@cloudflare/vitest-pool-workers/types"
+    ],
     "resolveJsonModule": true,
     "noEmit": true,
     "isolatedModules": true,

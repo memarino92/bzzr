@@ -2,12 +2,49 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "bzzr",
   "main": "src/worker.tsx",
-  "compatibility_date": "2026-09-01",
+  "compatibility_date": "2026-08-01",
   "compatibility_flags": ["nodejs_compat"],
-  "assets": { "binding": "ASSETS" },
-  "observability": { "enabled": true, "head_sampling_rate": 0.1 },
-  // Preserve the starter's migration history for existing deployments.
+  "assets": {
+    "binding": "ASSETS",
+  },
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 0.1,
+  },
   "migrations": [
-    { "tag": "v1", "new_sqlite_classes": ["SessionDurableObject"] },
+    {
+      "tag": "v1",
+      "new_sqlite_classes": ["SessionDurableObject"],
+    },
+    {
+      "new_sqlite_classes": ["BuzzerRoom"],
+      "tag": "v2",
+    },
+  ],
+  "durable_objects": {
+    "bindings": [
+      {
+        "class_name": "BuzzerRoom",
+        "name": "ROOMS",
+      },
+    ],
+  },
+  "ratelimits": [
+    {
+      "namespace_id": "1001",
+      "simple": {
+        "limit": 10,
+        "period": 60,
+      },
+      "name": "CREATE_LIMITER",
+    },
+    {
+      "namespace_id": "1002",
+      "simple": {
+        "limit": 120,
+        "period": 60,
+      },
+      "name": "JOIN_LIMITER",
+    },
   ],
 }

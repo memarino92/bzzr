@@ -19,7 +19,11 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint . --max-warnings 0",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "test": "vitest run",
+    "test:unit": "vitest run --config vitest.config.ts",
+    "test:coverage": "vitest run --coverage",
+    "test:integration": "vitest run --config vitest.workers.config.ts"
   },
   "dependencies": {
     "@headlessui/react": "2.2.10",
