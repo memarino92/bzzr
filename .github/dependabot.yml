@@ -1,0 +1,21 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    groups:
+      react:
+        patterns:
+          ["react", "react-dom", "react-server-dom-webpack", "@types/react*"]
+      storybook:
+        patterns: ["storybook", "@storybook/*"]
+      vitest:
+        patterns: ["vitest", "@vitest/*", "@cloudflare/vitest-pool-workers"]
+      cloudflare:
+        patterns: ["wrangler", "@cloudflare/vite-plugin"]
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly

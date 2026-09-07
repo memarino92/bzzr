@@ -1,0 +1,15 @@
+name: Feature idea
+description: Propose a focused improvement.
+body:
+  - type: textarea
+    id: need
+    attributes:
+      label: User need
+      description: What should a host or player be able to do, and why?
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: Smallest useful version
+      description: Include acceptance criteria and anything intentionally out of scope.

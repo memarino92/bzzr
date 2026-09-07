@@ -1,0 +1,21 @@
+name: Bug report
+description: Report an unexpected room or interface behavior.
+labels: [bug]
+body:
+  - type: textarea
+    id: behavior
+    attributes:
+      label: What happened?
+      description: Include expected behavior and steps to reproduce.
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Browser and device
+      placeholder: Chrome on Android, Safari on iPhone, etc.
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Helpful context
+      description: Screenshots or console errors are welcome. Do not include cookies, credentials, or private participant names.
