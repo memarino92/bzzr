@@ -1,13 +1,15 @@
-import { RequestInfo } from "rwsdk/worker";
-
-export function Home({ ctx }: RequestInfo) {
+export function Home() {
   return (
-    <div>
-      <p>
-        {ctx.user?.username
-          ? `You are logged in as user ${ctx.user.username}`
-          : "You are not logged in"}
+    <main className="mx-auto max-w-4xl px-6 py-24">
+      <p className="font-mono text-sm font-bold uppercase tracking-widest text-lime-700">
+        bzzr
       </p>
-    </div>
+      <h1 className="mt-6 text-5xl font-semibold tracking-tight">
+        First in. Game on.
+      </h1>
+      <p className="mt-6 text-lg text-zinc-600">
+        Your trivia night. One room code. A buzzer for everyone.
+      </p>
+    </main>
   );
 }

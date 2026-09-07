@@ -1,62 +1,27 @@
-# Standard RedwoodSDK Starter
+# bzzr
 
-This "standard starter" is the recommended implementation for RedwoodSDK. You get a Typescript project with:
+A small, realtime buzzer for big trivia nights.
 
-- Vite
-- database (Prisma via D1)
-- Session Management (via DurableObjects)
-- Passkey authentication (Webauthn)
-- Storage (via R2)
+Built with RedwoodSDK, React, Tailwind CSS, and Cloudflare Durable Objects.
+Host a room, invite players with a short code, and see who buzzed first.
+Questions, answers, scoring, and video calls stay outside the app.
 
-## Creating your project
+## Development
 
-```shell
-npx create-rwsdk my-project-name
-cd my-project-name
-npm install
+Use Node 24+ and pnpm 11.19.0.
+
+```sh
+corepack enable
+pnpm install --frozen-lockfile
+pnpm generate
+pnpm dev
 ```
 
-## Running the dev server
+Open http://localhost:5173. Cloudflare resources run locally through workerd.
+No secrets or Cloudflare account are needed for development.
 
-```shell
-pnpm run dev
-```
+- [AI instructions](AGENTS.md)
+- [Platform decision](docs/decisions/0001-platform-and-boundaries.md)
+- [MIT license](LICENSE) · [Third-party notices](THIRD_PARTY_NOTICES.md)
 
-Point your browser to the URL displayed in the terminal (e.g. `http://localhost:5173/`). You should see a "Hello World" message in your browser.
-
-## Deploying your app
-
-### Wrangler Setup
-
-Within your project's `wrangler.jsonc`:
-
-- Replace the `__change_me__` placeholders with a name for your application
-
-- Create a new D1 database:
-
-```shell
-npx wrangler d1 create my-project-db
-```
-
-Copy the database ID provided and paste it into your project's `wrangler.jsonc` file:
-
-```jsonc
-{
-  "d1_databases": [
-    {
-      "binding": "DB",
-      "database_name": "my-project-db",
-      "database_id": "your-database-id",
-    },
-  ],
-}
-```
-
-### Authentication Setup
-
-For authentication setup and configuration, including optional bot protection, see the [Authentication Documentation](https://docs.rwsdk.com/core/authentication).
-
-## Further Reading
-
-- [RedwoodSDK Documentation](https://docs.rwsdk.com/)
-- [Cloudflare Workers Secrets](https://developers.cloudflare.com/workers/runtime-apis/secrets/)
+Implementation, tests, Storybook, and operating docs are being built in logical commits.

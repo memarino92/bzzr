@@ -1,0 +1,11 @@
+pnpm-lock.yaml
+worker-configuration.d.ts
+node_modules/
+dist/
+storybook-static/
+coverage/
+playwright-report/
+test-results/
+.wrangler/
+src/app/components/catalyst/
+
