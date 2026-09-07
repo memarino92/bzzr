@@ -1,7 +1,7 @@
 # Working on bzzr
 
 bzzr uses RedwoodSDK, React, Tailwind CSS, and one SQLite Durable Object per room.
-Start with README.md and docs/decisions.
+Start with [README.md](README.md), [architecture](docs/architecture.md), and [decisions](docs/decisions/README.md).
 
 ## Working agreement
 
@@ -30,7 +30,7 @@ Start with README.md and docs/decisions.
 ## Validation
 
 Use Node 24+ and pinned pnpm. Install with --frozen-lockfile and run pnpm generate
-after Wrangler changes. Consult package.json for checks. Report what ran and blockers.
+after Wrangler changes. Run pnpm check for every change; use pnpm test:stories and pnpm test:e2e for UI changes. Run pnpm verify before release. See docs/testing.md for scope. Report what ran and blockers.
 
 ## AI collaboration
 
