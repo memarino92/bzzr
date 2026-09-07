@@ -3,6 +3,10 @@ import { defineApp } from "rwsdk/worker";
 import { render, route } from "rwsdk/router";
 import { Document } from "./app/Document";
 import { Home } from "./app/pages/Home";
+import { AppShell } from "./app/components/AppShell";
+import { RoomClient } from "./app/components/RoomClient";
+import { RoomNotice } from "./app/components/RoomNotice";
+import { normalizeCode } from "./domain/protocol";
 import { setCommonHeaders } from "./app/headers";
 import { handleApi } from "./server/api";
 
@@ -16,5 +20,31 @@ export default defineApp([
       return handleApi(request, env);
   },
   route("/health", () => Response.json({ status: "ok" })),
-  render(Document, [route("/", Home)]),
+  render(Document, [
+    route("/", Home),
+    route("/room/:code", ({ params, response }) => {
+      try {
+        return (
+          <AppShell>
+            <RoomClient code={normalizeCode(params.code)} />
+          </AppShell>
+        );
+      } catch {
+        response.status = 404;
+        return (
+          <AppShell>
+            <RoomNotice kind="not-found" />
+          </AppShell>
+        );
+      }
+    }),
+    route("*", ({ response }) => {
+      response.status = 404;
+      return (
+        <AppShell>
+          <RoomNotice kind="not-found" />
+        </AppShell>
+      );
+    }),
+  ]),
 ]);

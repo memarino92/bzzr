@@ -10,6 +10,7 @@ export default defineConfig({
       include: [
         "src/domain/**",
         "src/app/hooks/**",
+        "src/app/lib/**",
         "src/app/components/*.tsx",
         "src/server/http.ts",
       ],
