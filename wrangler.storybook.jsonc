@@ -1,0 +1,14 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "bzzr-storybook",
+  "compatibility_date": "2026-08-01",
+  "assets": {
+    "directory": "./storybook-static",
+  },
+  "routes": [
+    {
+      "pattern": "storybook.bzzr.app",
+      "custom_domain": true,
+    },
+  ],
+}

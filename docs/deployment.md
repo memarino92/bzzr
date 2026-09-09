@@ -39,6 +39,51 @@ Run `pnpm verify` before release. CI does not require Cloudflare credentials and
 contains no deploy token. Protect main and require both CI jobs before production
 releases; configure that policy in GitHub/Cloudflare, not only in this document.
 
+## Storybook hosting
+
+Storybook uses a separate static-assets Worker, `bzzr-storybook`, configured in
+`wrangler.storybook.jsonc`. This keeps the component workshop independent of the
+game Worker and its room storage. It serves the existing `storybook-static/` build
+without a Worker script, bindings, or migrations. Cloudflare owns deployment through
+its Git integration; GitHub CI continues to validate and retain the static artifact.
+
+In the Cloudflare dashboard, create/connect `bzzr-storybook` to this repository
+using these Workers Builds settings:
+
+| Setting                              | Value                                                                  |
+| ------------------------------------ | ---------------------------------------------------------------------- |
+| Production branch                    | `main`                                                                 |
+| Root directory                       | Repository root                                                        |
+| Node / pnpm                          | Node 24+ / pnpm 11.19.0                                                |
+| Build command                        | `pnpm install --frozen-lockfile && pnpm storybook:build`               |
+| Deploy command                       | `pnpm exec wrangler deploy --config wrangler.storybook.jsonc`          |
+| Non-production branch deploy command | `pnpm exec wrangler versions upload --config wrangler.storybook.jsonc` |
+
+The non-production command is needed only if branch preview builds are enabled.
+Always select the explicit Storybook config: the default config deploys the game,
+and its Vite build can also leave a generated deployment config behind.
+
+The Storybook config declares `storybook.bzzr.app` as a custom domain. Before the
+first deployment, confirm that `bzzr.app` is an active zone in the same Cloudflare
+account and resolve any conflicting DNS record for that hostname. Cloudflare
+provisions the custom-domain DNS record and TLS certificate during deployment.
+
+Run `pnpm generate` and `pnpm check` after configuration changes. Before publishing,
+run `pnpm verify`. To validate the Storybook deployment bundle without publishing:
+
+```sh
+pnpm storybook:build
+pnpm exec wrangler deploy --config wrangler.storybook.jsonc --dry-run
+```
+
+After the dashboard deployment, check `https://storybook.bzzr.app`, a direct story
+link, the Docs view, and the playable local round. The stories use simulated room
+state. Preserve the Catalyst notice and the application-only scope described in
+[third-party notices](../THIRD_PARTY_NOTICES.md).
+
+See Cloudflare's [Workers Builds settings](https://developers.cloudflare.com/workers/ci-cd/builds/configuration/)
+and [custom-domain setup](https://developers.cloudflare.com/workers/configuration/routing/custom-domains/).
+
 ## Manual deployment
 
 After authenticating with the intended Cloudflare account, use `pnpm release`.
