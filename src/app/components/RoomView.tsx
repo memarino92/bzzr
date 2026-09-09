@@ -99,7 +99,8 @@ export function RoomView({
             </p>
             <h2 className="mt-2 text-2xl font-bold tracking-tight">
               {position ? "Nice reflexes, " : "Ready, "}
-              {me?.name}?
+              {me?.name}
+              {position ? "!" : "?"}
             </h2>
           </div>
           <Buzzer
