@@ -13,3 +13,20 @@ part of the interface. Styles use Tailwind utilities and shared theme tokens in
 Review the Home stories (including join mode), room states, and end-room dialog
 at desktop and mobile sizes. Existing game behavior and server authority are
 unchanged by this presentation update.
+
+## Phone play prototype
+
+Open `/prototype/play` for a separate, deterministic local demo. It uses three
+fictional participants and simulates a buzz locally; it does not join a live room.
+The existing `/room/:code` experience remains the live game.
+
+The prototype gives equal screen width to buzz order and a full-height lime tap
+target. Left-handed mode swaps the two columns without resetting the round or
+moving keyboard focus. The participant drawer starts closed, with a live count
+and chevron. Results scroll independently when the list is long. The switch is
+local to the page and resets on reload. New round is a demo control.
+
+Storybook's Prototype/Play stories cover results, empty rounds, sending, locked,
+waiting, connection loss, handedness, the drawer, and a full room with long names.
+Connecting this layout to the server and choosing preference persistence are
+follow-up decisions after reviewing the prototype.

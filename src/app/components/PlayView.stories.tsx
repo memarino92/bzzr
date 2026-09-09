@@ -1,0 +1,68 @@
+import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, fn, userEvent, within } from "storybook/test";
+import { PlayView } from "./PlayView";
+import { sampleRoom, resultsRoom } from "./fixtures";
+
+const meta = {
+  title: "Prototype/Play",
+  component: PlayView,
+  parameters: { layout: "fullscreen" },
+  args: { room: sampleRoom, you: "sam", connection: "connected", onBuzz: fn() },
+} satisfies Meta<typeof PlayView>;
+export default meta;
+type Story = StoryObj<typeof meta>;
+
+export const Ready: Story = {
+  play: async ({ canvasElement, args }) => {
+    await userEvent.click(
+      within(canvasElement).getByRole("button", { name: "Buzz in" }),
+    );
+    await expect(args.onBuzz).toHaveBeenCalledOnce();
+  },
+};
+export const Results: Story = { args: { room: resultsRoom } };
+export const LeftHanded: Story = {
+  play: async ({ canvasElement }) => {
+    const control = within(canvasElement).getByRole("switch", {
+      name: "Left-handed mode",
+    });
+    await userEvent.click(control);
+    await expect(control).toBeChecked();
+  },
+};
+export const ParticipantsOpen: Story = {
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await userEvent.click(canvas.getByText("Participants (4)"));
+    await expect(
+      canvas.getByRole("list", { name: "Participants" }),
+    ).toBeVisible();
+  },
+};
+export const Waiting: Story = {
+  args: { room: { ...sampleRoom, status: "waiting", round: 0 } },
+};
+export const Locked: Story = {
+  args: { room: { ...resultsRoom, status: "locked" }, you: "riley" },
+};
+export const Sending: Story = { args: { pending: true } };
+export const Reconnecting: Story = { args: { connection: "reconnecting" } };
+export const ConnectionLost: Story = { args: { connection: "failed" } };
+export const FullRoom: Story = {
+  args: {
+    you: "2",
+    room: {
+      ...sampleRoom,
+      players: Array.from({ length: 60 }, (_, i) => ({
+        id: String(i),
+        name: "AnEnthusiasticContestant",
+        isHost: i === 0,
+        online: i % 3 !== 0,
+      })),
+      buzzes: Array.from({ length: 60 }, (_, i) => ({
+        playerId: String(i),
+        position: i + 1,
+      })),
+    },
+  },
+};
