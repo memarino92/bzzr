@@ -99,32 +99,36 @@ export function PlayView({
             )}
           </section>
 
-          <button
-            type="button"
-            aria-label="Buzz in"
-            disabled={disabled}
-            onClick={onBuzz}
-            className={`flex min-w-0 flex-col items-center justify-center gap-3 px-2 py-8 text-zinc-950 focus-visible:z-10 focus-visible:outline-4 focus-visible:outline-offset-[-6px] focus-visible:outline-blue-700 enabled:cursor-pointer enabled:active:bg-lime-400 ${leftHanded ? "col-start-1 row-start-1 border-r-2" : "col-start-2 row-start-1 border-l-2"} border-zinc-950 dark:border-zinc-500 ${position ? "bg-lime-200" : disabled ? "bg-zinc-200 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300" : "bg-lime-300"}`}
+          <div
+            className={`flex min-w-0 items-center justify-center px-3 py-6 ${leftHanded ? "col-start-1 row-start-1 border-r-2" : "col-start-2 row-start-1 border-l-2"} border-zinc-950 dark:border-zinc-500`}
           >
-            <span className="text-3xl font-black tracking-tight sm:text-5xl">
-              {position
-                ? `#${position}`
-                : pending
-                  ? "Sending"
-                  : !connected
-                    ? "Offline"
-                    : room.status === "open"
-                      ? "BUZZ"
-                      : "Wait"}
-            </span>
-            <span className="text-center text-xs font-bold sm:text-sm">
-              {position
-                ? "You’re in!"
-                : disabled
-                  ? "Hold tight"
-                  : "Tap anywhere here"}
-            </span>
-          </button>
+            <button
+              type="button"
+              aria-label="Buzz in"
+              disabled={disabled}
+              onClick={onBuzz}
+              className={`flex aspect-square w-full max-w-72 shrink-0 flex-col items-center justify-center gap-2 rounded-full border-[8px] text-zinc-950 shadow-[0_8px_0_var(--color-zinc-300)] focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-blue-700 enabled:cursor-pointer enabled:active:translate-y-1 enabled:active:shadow-[0_4px_0_var(--color-zinc-300)] dark:shadow-[0_8px_0_var(--color-zinc-700)] dark:enabled:active:shadow-[0_4px_0_var(--color-zinc-700)] ${position ? "border-lime-200 bg-lime-100" : disabled ? "border-zinc-300 bg-zinc-200 text-zinc-600 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300" : "border-lime-200 bg-lime-300 enabled:hover:bg-lime-200"}`}
+            >
+              <span className="text-2xl font-black tracking-tight sm:text-4xl">
+                {position
+                  ? `#${position}`
+                  : pending
+                    ? "Sending"
+                    : !connected
+                      ? "Offline"
+                      : room.status === "open"
+                        ? "BUZZ"
+                        : "Wait"}
+              </span>
+              <span className="text-center text-xs font-bold sm:text-sm">
+                {position
+                  ? "You’re in!"
+                  : disabled
+                    ? "Hold tight"
+                    : "Press to buzz"}
+              </span>
+            </button>
+          </div>
         </div>
 
         <button

@@ -20,8 +20,8 @@ Open `/prototype/play` for a separate, deterministic local demo. It uses three
 fictional participants and simulates a buzz locally; it does not join a live room.
 The existing `/room/:code` experience remains the live game.
 
-The prototype gives equal screen width to buzz order and a full-height lime tap
-target. Left-handed mode swaps the two columns without resetting the round or
+The prototype gives equal screen width to buzz order and a large circular lime buzzer
+with a raised edge and pressed feedback. Left-handed mode swaps the two columns without resetting the round or
 moving keyboard focus. The participant drawer starts closed, with a live count
 and chevron. Results scroll independently when the list is long. The switch is
 local to the page and resets on reload. New round is a demo control.
