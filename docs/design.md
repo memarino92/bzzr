@@ -23,6 +23,12 @@ Use `/prototype/play?players=24` to preview two dozen participants, with 23
 already in the buzz order and your buzzer ready to take the final spot.
 Several demo names approach the 24-character limit, including unbroken names,
 to exercise wrapping in the results column and participant drawer.
+Add `&host=1` (or use `/prototype/play?host=1`) for the host view. It starts with
+buzzing closed and adds a compact Open buzzing / Next round and Lock buzzing
+control bar. End room is available only to hosts in the hamburger menu, with a
+confirmation dialog. The host can buzz too. Sample buzzes simulates the other
+participants; ending requires confirmation and Restart demo restores the fixture.
+These are local demo transitions, not live room authority or authorization.
 
 The prototype gives equal screen width to buzz order and a large circular lime buzzer
 with a raised edge and pressed feedback. Left-handed mode swaps the two columns without resetting the round or

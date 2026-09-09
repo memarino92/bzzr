@@ -25,6 +25,7 @@ export default defineApp([
     route("/", Home),
     route("/prototype/play", ({ request }) => (
       <PlayPrototype
+        host={new URL(request.url).searchParams.get("host") === "1"}
         playerCount={
           new URL(request.url).searchParams.get("players") === "24" ? 24 : 3
         }

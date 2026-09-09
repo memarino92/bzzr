@@ -4,7 +4,8 @@ import { useHandedness } from "../hooks/useHandedness";
 import { PlayMenu } from "./PlayMenu";
 import { ParticipantDrawer } from "./ParticipantDrawer";
 import { ThemeToggle } from "./ThemeToggle";
-import type { RoomSnapshot } from "../../domain/protocol";
+import { PlayHostControls } from "./PlayHostControls";
+import type { Command, RoomSnapshot } from "../../domain/protocol";
 import type { Connection } from "./RoomView";
 
 export interface PlayViewProps {
@@ -14,6 +15,7 @@ export interface PlayViewProps {
   pending?: boolean;
   rememberHandedness?: boolean;
   onBuzz: () => void;
+  onHostCommand?: (command: Command) => void;
 }
 
 export function PlayView({
@@ -23,9 +25,13 @@ export function PlayView({
   pending = false,
   rememberHandedness = true,
   onBuzz,
+  onHostCommand,
 }: PlayViewProps) {
   const [leftHanded, toggleHandedness] = useHandedness(rememberHandedness);
   const connected = connection === "connected";
+  const isHost = room.players.some(
+    (player) => player.id === you && player.isHost,
+  );
   const position = room.buzzes.find((buzz) => buzz.playerId === you)?.position;
   const disabled =
     !connected || room.status !== "open" || pending || !!position;
@@ -41,7 +47,9 @@ export function PlayView({
           ? "Buzzing is open"
           : room.status === "locked"
             ? "Buzzing is locked"
-            : "Waiting for the host";
+            : isHost
+              ? "Open buzzing to start"
+              : "Waiting for the host";
 
   return (
     <div className="mx-auto flex h-[calc(100dvh-3rem)] w-full max-w-3xl flex-col bg-zinc-50 text-zinc-950 scheme-light dark:bg-zinc-950 dark:text-white dark:scheme-dark">
@@ -55,7 +63,9 @@ export function PlayView({
         </a>
         <div className="text-center">
           <h1 className="font-mono text-sm font-bold">{room.code}</h1>
-          <p className="mt-1 text-xs">Round {room.round}</p>
+          <p className="mt-1 text-xs">
+            {isHost ? "Host · " : ""}Round {room.round}
+          </p>
         </div>
         <div className="flex items-center gap-2">
           <ThemeToggle />
@@ -63,6 +73,12 @@ export function PlayView({
             code={room.code}
             leftHanded={leftHanded}
             onToggle={toggleHandedness}
+            onEnd={
+              isHost && onHostCommand
+                ? () => onHostCommand({ type: "end" })
+                : undefined
+            }
+            endDisabled={!connected || pending}
           />
         </div>
       </header>
@@ -150,6 +166,13 @@ export function PlayView({
           </div>
         </div>
 
+        {isHost && onHostCommand && (
+          <PlayHostControls
+            room={room}
+            disabled={!connected || pending}
+            onCommand={onHostCommand}
+          />
+        )}
         <ParticipantDrawer players={room.players} you={you} />
       </main>
     </div>

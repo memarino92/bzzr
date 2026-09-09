@@ -27,6 +27,29 @@ export const Ready: Story = {
   },
 };
 export const Results: Story = { args: { room: resultsRoom } };
+export const HostWaiting: Story = {
+  args: {
+    you: "alex",
+    room: { ...sampleRoom, status: "waiting", round: 0 },
+    onHostCommand: fn(),
+  },
+};
+export const HostResults: Story = {
+  args: { you: "alex", room: resultsRoom, onHostCommand: fn() },
+};
+export const HostOffline: Story = {
+  args: { you: "alex", connection: "reconnecting", onHostCommand: fn() },
+};
+export const HostMenu: Story = {
+  args: { you: "alex", onHostCommand: fn() },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await userEvent.click(canvas.getByRole("button", { name: "Room menu" }));
+    await expect(
+      canvas.getByRole("button", { name: "End room" }),
+    ).toBeVisible();
+  },
+};
 export const LeftHanded: Story = {
   play: async ({ canvasElement }) => {
     await userEvent.click(

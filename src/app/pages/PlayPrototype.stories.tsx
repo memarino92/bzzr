@@ -10,3 +10,6 @@ export default meta;
 export const TwentyFourPlayers: StoryObj<typeof meta> = {
   args: { playerCount: 24 },
 };
+export const HostDemo: StoryObj<typeof meta> = {
+  args: { host: true, playerCount: 24 },
+};

@@ -1,6 +1,61 @@
 import { expect, test } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 
+test("host prototype opens, fills, locks, resets, and ends a room", async ({
+  page,
+}) => {
+  await page.goto("/prototype/play?host=1&players=24");
+  const buzzer = page.getByRole("button", { name: "Buzz in" });
+  await expect(
+    page.getByRole("region", { name: "Host controls" }),
+  ).toBeVisible();
+  await expect(buzzer).toBeDisabled();
+  await expect(
+    page
+      .getByRole("region", { name: "Host controls" })
+      .getByRole("button", { name: "End room" }),
+  ).toHaveCount(0);
+  await expect(
+    page.getByRole("button", { name: "Lock buzzing" }),
+  ).toBeDisabled();
+  await page.getByRole("button", { name: "Open buzzing" }).click();
+  await expect(buzzer).toBeEnabled();
+  await page.getByRole("button", { name: "Sample buzzes" }).click();
+  await expect(
+    page.getByRole("list", { name: "Buzz order" }).getByRole("listitem"),
+  ).toHaveCount(23);
+  await buzzer.click();
+  await expect(page.getByRole("status")).toHaveText("You’re #24");
+  await page.getByRole("button", { name: "Lock buzzing" }).click();
+  await expect(
+    page.getByRole("button", { name: "Lock buzzing" }),
+  ).toBeDisabled();
+  await page.getByRole("button", { name: "Next round" }).click();
+  await expect(buzzer).toBeEnabled();
+  await expect(page.getByText("Host · Round 2")).toBeVisible();
+  await page.getByRole("button", { name: "Room menu" }).click();
+  await page.getByRole("button", { name: "End room", exact: true }).click();
+  await page.getByRole("button", { name: "Keep playing" }).click();
+  await expect(buzzer).toBeEnabled();
+  expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBe(true);
+  await page.getByRole("button", { name: "Room menu" }).click();
+  await page.getByRole("button", { name: "End room", exact: true }).click();
+  await page.getByRole("button", { name: "End room for everyone" }).click();
+  await expect(
+    page.getByRole("heading", { name: "That’s a wrap." }),
+  ).toBeVisible();
+  await expect(buzzer).not.toBeVisible();
+  await page.getByRole("button", { name: "Restart demo" }).click();
+  await expect(
+    page.getByRole("button", { name: "Open buzzing" }),
+  ).toBeVisible();
+});
+
 test("two dozen players fit in scrollable results and the participant drawer", async ({
   page,
 }) => {
@@ -42,6 +97,9 @@ test("room menu copies the code and dismisses with Escape", async ({
   await page.goto("/prototype/play");
   await expect(page.getByRole("link", { name: "bzzr home" })).toBeVisible();
   await page.getByRole("button", { name: "Room menu" }).click();
+  await expect(
+    page.getByRole("button", { name: "End room", exact: true }),
+  ).toHaveCount(0);
   await page.getByRole("button", { name: "Copy room code" }).click();
   await expect(
     page.getByRole("button", { name: "Room code copied ✓" }),
