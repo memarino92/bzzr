@@ -1,6 +1,27 @@
 import { expect, test } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 
+test("two dozen players fit in scrollable results and the participant drawer", async ({
+  page,
+}) => {
+  await page.goto("/prototype/play?players=24");
+  const results = page.getByRole("list", { name: "Buzz order" });
+  await expect(results.getByRole("listitem")).toHaveCount(23);
+  await page.getByRole("button", { name: "Buzz in" }).click();
+  await expect(page.getByRole("status")).toHaveText("You’re #24");
+  await expect(results.getByRole("listitem")).toHaveCount(24);
+  await results.focus();
+  await page.keyboard.press("End");
+  await expect(results.getByText("You", { exact: true })).toBeInViewport();
+  await page.getByText("Participants (24)").click();
+  await expect(
+    page.getByRole("list", { name: "Participants" }).getByRole("listitem"),
+  ).toHaveCount(24);
+  expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+  await page.getByRole("button", { name: "New round" }).click();
+  await expect(page.getByText("Participants (24)")).toBeVisible();
+});
+
 test("play prototype swaps sides, discloses participants, and plays another round", async ({
   page,
 }) => {

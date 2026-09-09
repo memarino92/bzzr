@@ -17,8 +17,49 @@ const demoRoom: RoomSnapshot = {
   buzzes: [{ playerId: "alex", position: 1 }],
 };
 
-export function PlayPrototype() {
-  const [room, setRoom] = useState(demoRoom);
+const largeDemoRoom: RoomSnapshot = {
+  ...demoRoom,
+  players: [
+    "Alex",
+    "Sam",
+    "Jules",
+    "Riley",
+    "Morgan",
+    "Casey",
+    "Jordan",
+    "Taylor",
+    "Avery",
+    "Cameron",
+    "Drew",
+    "Quinn",
+    "Harper",
+    "Jamie",
+    "Reese",
+    "Parker",
+    "Rowan",
+    "Skyler",
+    "Finley",
+    "Emerson",
+    "Charlie",
+    "Dakota",
+    "Blake",
+    "Sage",
+  ].map((name, index) => ({
+    id: name.toLowerCase(),
+    name,
+    isHost: index === 0,
+    online: true,
+  })),
+  buzzes: [],
+};
+largeDemoRoom.buzzes = largeDemoRoom.players
+  .filter((player) => player.id !== "sam")
+  .map((player, index) => ({ playerId: player.id, position: index + 1 }));
+
+export function PlayPrototype({ playerCount = 3 }: { playerCount?: 3 | 24 }) {
+  const [room, setRoom] = useState(
+    playerCount === 24 ? largeDemoRoom : demoRoom,
+  );
   return (
     <>
       <aside
@@ -30,7 +71,7 @@ export function PlayPrototype() {
           type="button"
           className="min-h-8 px-2 font-bold underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-lime-300"
           onClick={() =>
-            setRoom({ ...demoRoom, round: room.round + 1, buzzes: [] })
+            setRoom({ ...room, round: room.round + 1, buzzes: [] })
           }
         >
           New round

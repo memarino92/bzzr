@@ -23,7 +23,13 @@ export default defineApp([
   route("/health", () => Response.json({ status: "ok" })),
   render(Document, [
     route("/", Home),
-    route("/prototype/play", PlayPrototype),
+    route("/prototype/play", ({ request }) => (
+      <PlayPrototype
+        playerCount={
+          new URL(request.url).searchParams.get("players") === "24" ? 24 : 3
+        }
+      />
+    )),
     route("/room/:code", ({ params, response }) => {
       try {
         return (

@@ -168,7 +168,10 @@ export function PlayView({
           </summary>
           <ul
             aria-label="Participants"
-            className="max-h-60 divide-y divide-zinc-300 overflow-y-auto px-4 pb-4 dark:divide-zinc-700"
+            // Keyboard users need to focus the drawer's scrolling content.
+            // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
+            tabIndex={0}
+            className="max-h-60 divide-y divide-zinc-300 overflow-y-auto px-4 pb-4 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-blue-600 dark:divide-zinc-700"
           >
             {room.players.map((player) => (
               <li
