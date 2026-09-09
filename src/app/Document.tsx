@@ -1,12 +1,17 @@
 import type { DocumentProps } from "rwsdk/router";
 import stylesheet from "./styles.css?url";
+import { themeBootstrapScript } from "./lib/theme";
 
 export function Document({ children, rw }: DocumentProps) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <script
+          nonce={rw.nonce}
+          dangerouslySetInnerHTML={{ __html: themeBootstrapScript }}
+        />
         <meta
           name="description"
           content="Your trivia night. One room code. A buzzer for everyone."
@@ -49,7 +54,7 @@ export function Document({ children, rw }: DocumentProps) {
         <link rel="stylesheet" href={stylesheet} />
         <link rel="modulepreload" href="/src/client.tsx" />
       </head>
-      <body className="min-h-dvh bg-zinc-50 font-sans text-zinc-950 antialiased dark:bg-zinc-950 dark:text-white">
+      <body className="min-h-dvh bg-zinc-50 font-sans text-zinc-950 antialiased scheme-light dark:bg-zinc-950 dark:text-white dark:scheme-dark">
         <div id="root">{children}</div>
         <script nonce={rw.nonce}>import("/src/client.tsx")</script>
       </body>

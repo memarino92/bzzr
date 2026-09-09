@@ -3,6 +3,7 @@
 import { useHandedness } from "../hooks/useHandedness";
 import { PlayMenu } from "./PlayMenu";
 import { ParticipantDrawer } from "./ParticipantDrawer";
+import { ThemeToggle } from "./ThemeToggle";
 import type { RoomSnapshot } from "../../domain/protocol";
 import type { Connection } from "./RoomView";
 
@@ -56,11 +57,14 @@ export function PlayView({
           <h1 className="font-mono text-sm font-bold">{room.code}</h1>
           <p className="mt-1 text-xs">Round {room.round}</p>
         </div>
-        <PlayMenu
-          code={room.code}
-          leftHanded={leftHanded}
-          onToggle={toggleHandedness}
-        />
+        <div className="flex items-center gap-2">
+          <ThemeToggle />
+          <PlayMenu
+            code={room.code}
+            leftHanded={leftHanded}
+            onToggle={toggleHandedness}
+          />
+        </div>
       </header>
 
       <main className="flex min-h-0 flex-1 flex-col">

@@ -38,6 +38,15 @@ between tabs. Unavailable storage falls back to the current session. Clipboard
 failure offers a selectable code. Storybook disables persistence for deterministic
 examples. New round is a demo control.
 
+The light/dark button beside the hamburger menu follows the device appearance
+until the user first presses it. That action stores an explicit `light` or `dark`
+choice under `bzzr:theme`; subsequent system changes do not override it. There is
+no System option. The choice survives reloads and applies across app pages. A
+small nonce-protected head script restores it before the stylesheet paints.
+Without a saved choice, CSS continues to follow the system, including when
+JavaScript is unavailable. Blocked storage still allows switching the current
+page, but cannot preserve the choice after closing or reloading it.
+
 Storybook's Prototype/Play stories cover results, empty rounds, sending, locked,
 waiting, connection loss, handedness, the drawer, and a full room with long names.
 Connecting this layout to the server is a follow-up decision after reviewing the

@@ -1,5 +1,16 @@
 @import "tailwindcss";
 
+@custom-variant dark {
+  &:where([data-theme="dark"], [data-theme="dark"] *) {
+    @slot;
+  }
+  @media (prefers-color-scheme: dark) {
+    &:where(:root:not([data-theme]), :root:not([data-theme]) *) {
+      @slot;
+    }
+  }
+}
+
 @theme {
   --font-sans: "Arial", "Helvetica Neue", ui-sans-serif, system-ui, sans-serif;
   --shadow-pink: 6px 7px 0 var(--color-fuchsia-400);
