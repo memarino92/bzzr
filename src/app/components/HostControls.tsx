@@ -23,11 +23,11 @@ export function HostControls({
   return (
     <section
       aria-label="Host controls"
-      className="mb-8 rounded-2xl border border-zinc-950/10 bg-white p-5 dark:border-white/10 dark:bg-zinc-900"
+      className="game-panel mb-8 p-5 shadow-cyan"
     >
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h2 className="text-sm font-semibold">You’re running the room.</h2>
+          <h2 className="text-sm font-bold">You’re running the room.</h2>
           <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
             Reset for each question. You can buzz in too.
           </p>

@@ -1,5 +1,12 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Arial", "Helvetica Neue", ui-sans-serif, system-ui, sans-serif;
+  --shadow-pink: 6px 7px 0 var(--color-fuchsia-400);
+  --shadow-cyan: -5px 6px 0 var(--color-cyan-400);
+  --shadow-ink: 3px 3px 0 var(--color-zinc-950);
+}
+
+@utility game-panel {
+  @apply border-2 border-zinc-950 bg-white dark:border-zinc-300 dark:bg-zinc-900;
 }

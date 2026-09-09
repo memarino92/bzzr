@@ -31,9 +31,9 @@ export function Lobby() {
   return (
     <section
       aria-label="Get started"
-      className="rounded-2xl border border-zinc-950/10 bg-white p-6 shadow-sm sm:p-8 dark:border-white/10 dark:bg-zinc-900"
+      className="game-panel relative isolate p-6 shadow-pink before:absolute before:-inset-1 before:-z-10 before:rotate-2 before:border-2 before:border-zinc-950 before:bg-cyan-300 before:content-[''] after:absolute after:inset-0 after:-z-10 after:bg-white sm:p-8 dark:after:bg-zinc-900"
     >
-      <div className="mb-8 grid grid-cols-2 gap-1 rounded-xl bg-zinc-100 p-1 dark:bg-zinc-800">
+      <div className="mb-8 grid grid-cols-2 gap-2 border-b-2 border-zinc-950 pb-5 dark:border-zinc-300">
         {(["host", "join"] as const).map((value) => (
           <button
             key={value}
@@ -44,13 +44,13 @@ export function Lobby() {
               setMode(value);
               setError("");
             }}
-            className={`rounded-lg px-3 py-3 text-sm font-semibold transition focus-visible:outline-2 focus-visible:outline-lime-600 ${mode === value ? "bg-white text-zinc-950 shadow-sm dark:bg-zinc-700 dark:text-white" : "text-zinc-600 hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-white"}`}
+            className={`border-2 border-zinc-950 px-3 py-3 text-sm font-black focus-visible:outline-2 focus-visible:outline-lime-600 ${mode === value ? "bg-lime-300 text-zinc-950 shadow-ink" : "bg-zinc-100 text-zinc-600 hover:bg-cyan-100 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"}`}
           >
             {value === "host" ? "Host a room" : "Join an existing room"}
           </button>
         ))}
       </div>
-      <h2 className="mb-2 text-xl font-semibold tracking-tight">
+      <h2 className="mb-2 text-xl font-bold tracking-tight">
         {mode === "host"
           ? "Your room. Your rules."
           : "Your people are waiting."}

@@ -35,10 +35,10 @@ export function RoomView({
     <>
       <div className="mb-8 flex flex-wrap items-start justify-between gap-5">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-widest text-zinc-500 dark:text-zinc-400">
+          <p className="text-xs font-bold uppercase tracking-widest text-zinc-500 dark:text-zinc-400">
             Your room code
           </p>
-          <h1 className="mt-2 font-mono text-4xl font-bold tracking-[0.15em] sm:text-5xl">
+          <h1 className="mt-3 inline-block -rotate-2 border-2 border-zinc-950 bg-lime-300 px-3 py-2 font-mono text-4xl text-zinc-950 shadow-pink font-bold tracking-[0.15em] sm:text-5xl">
             {room.code}
           </h1>
           <div className="mt-4 flex items-center gap-3">
@@ -59,7 +59,7 @@ export function RoomView({
       {error && (
         <p
           role="alert"
-          className="mb-5 rounded-xl bg-red-50 p-4 text-sm text-red-800 dark:bg-red-950 dark:text-red-200"
+          className="mb-5 border-2 border-red-700 bg-red-50 p-4 text-sm text-red-800 dark:bg-red-950 dark:text-red-200"
         >
           {error}
         </p>
@@ -74,7 +74,7 @@ export function RoomView({
       {host && !host.online && !me?.isHost && (
         <p
           role="status"
-          className="mb-6 rounded-xl bg-amber-50 p-4 text-sm text-amber-900 dark:bg-amber-950 dark:text-amber-200"
+          className="mb-6 border-2 border-amber-700 bg-amber-50 p-4 text-sm text-amber-900 dark:bg-amber-950 dark:text-amber-200"
         >
           Your host is disconnected. Their controls will return when they
           reconnect.
@@ -97,7 +97,7 @@ export function RoomView({
                   ? "Buzzing is locked"
                   : "Waiting for the host"}
             </p>
-            <h2 className="mt-2 text-2xl font-semibold tracking-tight">
+            <h2 className="mt-2 text-2xl font-bold tracking-tight">
               {position ? "Nice reflexes, " : "Ready, "}
               {me?.name}?
             </h2>
