@@ -14,11 +14,11 @@ Review the Home stories (including join mode), room states, and end-room dialog
 at desktop and mobile sizes. Existing game behavior and server authority are
 unchanged by this presentation update.
 
-## Phone play prototype
+## Live play and local demos
 
 Open `/prototype/play` for a separate, deterministic local demo. It uses three
 fictional participants and simulates a buzz locally; it does not join a live room.
-The existing `/room/:code` experience remains the live game.
+Live `/room/:code` pages now use the same phone-first layout, connected to the real room authority. The demo route remains available for trying fictional room states.
 Use `/prototype/play?players=24` to preview two dozen participants, with 23
 already in the buzz order and your buzzer ready to take the final spot.
 Several demo names approach the 24-character limit, including unbroken names,
@@ -30,7 +30,7 @@ confirmation dialog. The host can buzz too. Sample buzzes simulates the other
 participants; ending requires confirmation and Restart demo restores the fixture.
 These are local demo transitions, not live room authority or authorization.
 
-The prototype gives equal screen width to buzz order and a large circular lime buzzer
+The live and demo views give equal screen width to buzz order and a large circular lime buzzer
 with a raised edge and pressed feedback. Left-handed mode swaps the two columns without resetting the round or
 moving keyboard focus. The participant drawer starts closed, with a live count
 and chevron. The whole results column scrolls, with its heading held at the top;
@@ -41,7 +41,7 @@ the drawer contains one scrollable list, supports Escape, and restores focus.
 The hamburger menu holds separate room-code and room-link copying actions and the left-handed switch. Handedness
 is stored on this device under `bzzr:left-handed` in localStorage and synchronized
 between tabs. Unavailable storage falls back to the current session. Clipboard
-failure offers a selectable code. Storybook disables persistence for deterministic
+failure offers a selectable code or link. Storybook disables persistence for deterministic
 examples. New round is a demo control.
 
 The light/dark button beside the hamburger menu follows the device appearance
@@ -55,8 +55,9 @@ page, but cannot preserve the choice after closing or reloading it.
 
 Storybook's Prototype/Play stories cover results, empty rounds, sending, locked,
 waiting, connection loss, handedness, the drawer, and a full room with long names.
-Connecting this layout to the server is a follow-up decision after reviewing the
-prototype.
+Pages/Room stories cover the same layout with live connection states, host absence,
+errors, and retry controls. Live rooms fill the viewport; only the demo reserves
+space for its simulation toolbar. See [ADR 0005](decisions/0005-mobile-play.md).
 
 ## Icons and sharing
 

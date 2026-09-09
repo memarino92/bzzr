@@ -37,7 +37,9 @@ tabs in one profile share identity.
 - Server-assigned order, duplicate protection, and stale-round rejection.
 - Cookie-based reconnection, clear offline feedback, and keyboard controls.
 - One independent room authority with hibernating WebSockets and alarm cleanup.
-- A responsive game UI, Storybook, and tests at four boundaries.
+- A phone-first split view with a big buzzer, scrolling results, and participant drawer.
+- Saved left-handed and light/dark preferences; room code and link sharing in the menu.
+- Storybook and tests at four boundaries.
 - CI, dependency maintenance, contributor/AI instructions, and decision records.
 
 Rooms support 60 people, retain only the current round, and clear after two hours
