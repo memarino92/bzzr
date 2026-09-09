@@ -33,11 +33,7 @@ export default defineApp([
     )),
     route("/room/:code", ({ params, response }) => {
       try {
-        return (
-          <AppShell>
-            <RoomClient code={normalizeCode(params.code)} />
-          </AppShell>
-        );
+        return <RoomClient code={normalizeCode(params.code)} />;
       } catch {
         response.status = 404;
         return (

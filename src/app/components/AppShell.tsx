@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { ThemeToggle } from "./ThemeToggle";
 
 export function AppShell({ children }: { children: ReactNode }) {
   return (
@@ -26,9 +27,12 @@ export function AppShell({ children }: { children: ReactNode }) {
               bzzr<span className="text-lime-700 dark:text-lime-300">.</span>
             </span>
           </a>
-          <span className="max-w-36 text-right font-mono text-xs font-bold uppercase sm:max-w-none text-zinc-500 dark:text-zinc-400">
-            Good company. Quick reflexes.
-          </span>
+          <div className="flex items-center gap-4">
+            <span className="hidden text-right font-mono text-xs font-bold uppercase sm:block text-zinc-500 dark:text-zinc-400">
+              Good company. Quick reflexes.
+            </span>
+            <ThemeToggle />
+          </div>
         </div>
       </header>
       <main

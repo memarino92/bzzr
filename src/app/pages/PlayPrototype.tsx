@@ -135,6 +135,7 @@ export function PlayPrototype({
         </div>
       ) : (
         <PlayView
+          demo
           room={room}
           you={you}
           connection="connected"

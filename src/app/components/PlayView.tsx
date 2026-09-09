@@ -14,6 +14,9 @@ export interface PlayViewProps {
   connection: Connection;
   pending?: boolean;
   rememberHandedness?: boolean;
+  demo?: boolean;
+  error?: string;
+  onRetry?: () => void;
   onBuzz: () => void;
   onHostCommand?: (command: Command) => void;
 }
@@ -24,6 +27,9 @@ export function PlayView({
   connection,
   pending = false,
   rememberHandedness = true,
+  demo = false,
+  error,
+  onRetry,
   onBuzz,
   onHostCommand,
 }: PlayViewProps) {
@@ -31,6 +37,11 @@ export function PlayView({
   const connected = connection === "connected";
   const isHost = room.players.some(
     (player) => player.id === you && player.isHost,
+  );
+  const hostAway =
+    room.players.some((player) => player.isHost && !player.online) && !isHost;
+  const first = room.players.find(
+    (player) => player.id === room.buzzes[0]?.playerId,
   );
   const position = room.buzzes.find((buzz) => buzz.playerId === you)?.position;
   const disabled =
@@ -52,7 +63,9 @@ export function PlayView({
               : "Waiting for the host";
 
   return (
-    <div className="mx-auto flex h-[calc(100dvh-3rem)] w-full max-w-3xl flex-col bg-zinc-50 text-zinc-950 scheme-light dark:bg-zinc-950 dark:text-white dark:scheme-dark">
+    <div
+      className={`mx-auto flex ${demo ? "h-[calc(100dvh-3rem)]" : "h-dvh"} w-full max-w-3xl flex-col bg-zinc-50 text-zinc-950 scheme-light dark:bg-zinc-950 dark:text-white dark:scheme-dark`}
+    >
       <header className="flex shrink-0 items-center justify-between gap-3 border-b-2 border-zinc-950 px-4 py-3 dark:border-zinc-500">
         <a
           href="/"
@@ -84,6 +97,37 @@ export function PlayView({
       </header>
 
       <main className="flex min-h-0 flex-1 flex-col">
+        {(error || hostAway || connection === "failed") && (
+          <section
+            aria-label="Room alerts"
+            className="max-h-[30dvh] shrink-0 overflow-y-auto border-b border-zinc-300 px-4 py-3 text-sm dark:border-zinc-600"
+          >
+            {error && (
+              <p role="alert" className="text-red-700 dark:text-red-400">
+                {error}
+              </p>
+            )}
+            {hostAway && (
+              <p className="text-amber-800 dark:text-amber-300">
+                Your host is disconnected. Waiting for them to reconnect.
+              </p>
+            )}
+            {connection === "failed" && onRetry && (
+              <button
+                type="button"
+                onClick={onRetry}
+                className="mt-2 min-h-11 border-2 border-zinc-950 px-3 font-bold focus-visible:outline-2 focus-visible:outline-blue-600 dark:border-zinc-400"
+              >
+                Retry connection
+              </button>
+            )}
+          </section>
+        )}
+        <p aria-live="polite" className="sr-only">
+          {first
+            ? `${first.name} buzzed first. ${room.buzzes.length} buzzes recorded.`
+            : "No buzzes recorded."}
+        </p>
         <div className="flex shrink-0 items-center justify-between gap-3 px-4 py-3">
           <p role="status" className="text-sm font-bold">
             {status}
