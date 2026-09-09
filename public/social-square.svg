@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1080" viewBox="0 0 1080 1080"><rect width="1080" height="1080" fill="#fafafa"/>
+<g font-family="Arial, Helvetica, sans-serif" fill="#09090b"><svg x="64" y="42" width="96" height="96" viewBox="0 0 80 80"><rect x="14" y="14" width="60" height="60" fill="#e879f9"/>
+<g transform="rotate(-6 38 38)">
+<rect x="6" y="6" width="60" height="60" fill="#bef264" stroke="#09090b" stroke-width="2.5"/>
+<path fill="#09090b" fill-rule="evenodd" d="M16 13h8v15c3-3 6-4 10-4 8 0 14 6 14 14s-6 14-14 14c-4 0-7-1-10-4v3h-8V13zm17 18c-5 0-8 3-8 7s3 7 8 7 7-3 7-7-2-7-7-7Z"/>
+<path fill="#09090b" d="M51 44h8v8h-8z"/>
+</g></svg>
+<text x="178" y="109" font-size="62" font-weight="900">bzzr.</text>
+<path d="M64 162h952" stroke="#09090b" stroke-width="3"/>
+<text x="64" y="310" font-size="126" font-weight="900" letter-spacing="-6">FIRST IN.</text>
+<g transform="rotate(-3 470 412)"><rect x="75" y="341" width="797" height="146" fill="#e879f9"/><rect x="64" y="330" width="797" height="146" fill="#bef264"/>
+<text x="80" y="451" font-size="134" font-weight="900" letter-spacing="-6">GAME ON.</text></g>
+<text x="68" y="554" font-size="32">A buzzer for your next trivia night.</text>
+<circle cx="540" cy="763" r="147" fill="#27272a"/><circle cx="540" cy="748" r="147" fill="#bef264" stroke="#d9f99d" stroke-width="16"/>
+<text x="540" y="770" text-anchor="middle" font-size="64" font-weight="900">BUZZ</text>
+<path d="M64 964h952" stroke="#09090b" stroke-width="3"/>
+<text x="64" y="1020" font-size="26" font-weight="700">NO ACCOUNTS. JUST QUICK REFLEXES.</text><text x="1016" y="1020" text-anchor="end" font-size="28" font-weight="700">bzzr.app</text></g></svg>

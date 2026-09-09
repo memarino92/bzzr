@@ -37,7 +37,7 @@ export function ShareRoom({ code }: { code: string }) {
             readOnly
             value={link}
             onFocus={(event) => event.target.select()}
-            className="mt-1 w-full rounded border border-zinc-300 bg-transparent p-2 text-sm dark:border-zinc-600"
+            className="mt-1 w-full rounded-none border border-zinc-300 bg-transparent p-2 text-sm dark:border-zinc-600"
           />
         </div>
       )}

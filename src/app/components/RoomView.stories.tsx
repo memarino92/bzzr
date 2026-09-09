@@ -2,7 +2,6 @@ import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { fn, expect, userEvent, within } from "storybook/test";
 import { RoomView } from "./RoomView";
-import { AppShell } from "./AppShell";
 import { sampleRoom, resultsRoom } from "./fixtures";
 
 const meta = {
@@ -16,13 +15,6 @@ const meta = {
     onRetry: fn(),
   },
   parameters: { layout: "fullscreen" },
-  decorators: [
-    (Story) => (
-      <AppShell>
-        <Story />
-      </AppShell>
-    ),
-  ],
 } satisfies Meta<typeof RoomView>;
 export default meta;
 type Story = StoryObj<typeof meta>;
@@ -111,9 +103,7 @@ export const PlayARound: Story = {
     await userEvent.click(canvas.getByRole("button", { name: "Open buzzing" }));
     await userEvent.click(canvas.getByRole("button", { name: "Buzz in" }));
     await expect(canvas.getByText("#1")).toBeVisible();
-    await userEvent.click(
-      canvas.getByRole("button", { name: "Reset for next question" }),
-    );
+    await userEvent.click(canvas.getByRole("button", { name: "Next round" }));
     await expect(canvas.getByRole("button", { name: "Buzz in" })).toBeEnabled();
   },
 };

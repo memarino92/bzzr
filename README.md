@@ -37,7 +37,9 @@ tabs in one profile share identity.
 - Server-assigned order, duplicate protection, and stale-round rejection.
 - Cookie-based reconnection, clear offline feedback, and keyboard controls.
 - One independent room authority with hibernating WebSockets and alarm cleanup.
-- A responsive Catalyst/Tailwind UI, Storybook, and tests at four boundaries.
+- A phone-first split view with a big buzzer, scrolling results, and participant drawer.
+- Saved left-handed and light/dark preferences; room code and link sharing in the menu.
+- Storybook and tests at four boundaries.
 - CI, dependency maintenance, contributor/AI instructions, and decision records.
 
 Rooms support 60 people, retain only the current round, and clear after two hours
@@ -59,6 +61,7 @@ pnpm verify                            # full release-candidate verification
 
 Storybook includes host/player views, waiting/open/locked rounds, results,
 reconnections, errors, long names, a full room, and a playable local round.
+The [visual direction](docs/design.md) brings a little 1990s game-night energy.
 CI retains a downloadable static Storybook and test reports.
 [Testing scope and limitations](docs/testing.md) · [Initial verification record](docs/verification.md)
 
@@ -89,7 +92,4 @@ presentation are separate, so each can be tested where its guarantees live.
 
 ## License
 
-Original bzzr code is [MIT](LICENSE). The copied Catalyst components remain under
-the Tailwind Plus license; see [third-party notices](THIRD_PARTY_NOTICES.md).
-The supplied external UI kit is read only, and all application components live
-inside this repository.
+Original bzzr code is [MIT](LICENSE). Third-party components retain their own licenses; see [third-party notices](THIRD_PARTY_NOTICES.md).

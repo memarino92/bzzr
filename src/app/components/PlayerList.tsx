@@ -9,7 +9,7 @@ export function PlayerList({
 }) {
   return (
     <section aria-label="Players" className="mt-6">
-      <h2 className="mb-4 text-sm font-semibold">
+      <h2 className="mb-4 text-sm font-bold">
         In the room{" "}
         <span className="ml-1 font-normal text-zinc-500 dark:text-zinc-400">
           ({players.length})
@@ -19,18 +19,18 @@ export function PlayerList({
         {players.map((player) => (
           <li
             key={player.id}
-            className="flex max-w-full items-center gap-2 rounded-full border border-zinc-950/10 px-3 py-2 text-xs dark:border-white/10"
+            className="flex max-w-full items-center gap-2 border-2 border-zinc-950 px-3 py-2 text-xs dark:border-zinc-500"
           >
             <span
               aria-hidden="true"
-              className={`size-1.5 shrink-0 rounded-full ${player.online ? "bg-lime-600 dark:bg-lime-400" : "bg-zinc-400"}`}
+              className={`size-1.5 shrink-0 rounded-none ${player.online ? "bg-lime-600 dark:bg-lime-400" : "bg-zinc-400"}`}
             />
             <span className="min-w-0 break-words">
               {player.name}
               {player.id === you ? " (you)" : ""}
             </span>
             {player.isHost && (
-              <span className="font-semibold text-zinc-500 dark:text-zinc-400">
+              <span className="font-bold text-zinc-500 dark:text-zinc-400">
                 Host
               </span>
             )}

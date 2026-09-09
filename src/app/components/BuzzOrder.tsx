@@ -5,10 +5,10 @@ export function BuzzOrder({ room, you }: { room: RoomSnapshot; you: string }) {
   return (
     <section
       aria-labelledby="buzz-order-heading"
-      className="rounded-2xl border border-zinc-950/10 bg-white p-6 dark:border-white/10 dark:bg-zinc-900"
+      className="game-panel p-6 shadow-pink"
     >
       <div className="mb-6 flex items-center justify-between">
-        <h2 id="buzz-order-heading" className="text-lg font-semibold">
+        <h2 id="buzz-order-heading" className="text-lg font-bold">
           Buzz order
         </h2>
         <span className="font-mono text-xs text-zinc-500 dark:text-zinc-400">
@@ -21,10 +21,8 @@ export function BuzzOrder({ room, you }: { room: RoomSnapshot; you: string }) {
           : "No buzzes yet."}
       </p>
       {room.buzzes.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-zinc-300 px-6 py-10 text-center dark:border-zinc-700">
-          <p className="text-sm font-semibold">
-            The first spot is up for grabs.
-          </p>
+        <div className="border-2 border-dashed border-zinc-300 px-6 py-10 text-center dark:border-zinc-700">
+          <p className="text-sm font-bold">The first spot is up for grabs.</p>
           <p className="mt-2 text-sm leading-6 text-zinc-500 dark:text-zinc-400">
             {room.status === "open"
               ? "Buzzes will appear here, in order."
@@ -38,7 +36,7 @@ export function BuzzOrder({ room, you }: { room: RoomSnapshot; you: string }) {
             return (
               <li
                 key={buzz.playerId}
-                className={`flex items-center gap-4 rounded-xl px-4 py-4 ${buzz.position === 1 ? "bg-lime-100 text-zinc-950" : "bg-zinc-50 dark:bg-zinc-800"}`}
+                className={`flex items-center gap-4 border-2 border-zinc-950 px-4 dark:border-zinc-500 py-4 ${buzz.position === 1 ? "-rotate-1 bg-lime-300 text-zinc-950 shadow-cyan" : "bg-zinc-50 dark:bg-zinc-800"}`}
               >
                 <span className="w-7 font-mono text-lg font-bold">
                   {String(buzz.position).padStart(2, "0")}

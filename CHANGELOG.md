@@ -4,6 +4,11 @@ Changes follow Conventional Commits. This log records user-visible milestones.
 
 ## 1.0.0 — Unreleased
 
+- Promote the phone-first play prototype to live host and player rooms.
+- Add a 90s-inspired visual style, a participant drawer, and a host-only end action in the room menu.
+- Remember handedness and explicit light/dark choices on the device, defaulting appearance to the system.
+- Add b. favicons and generic social sharing cards.
+
 - Replace the dormant starter with RedwoodSDK 1, React 19, and Tailwind CSS 4.
 - Add accountless host/player rooms with six-character codes and copyable invites.
 - Record authoritative buzz order with reset, lock, and end controls.

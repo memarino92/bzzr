@@ -20,7 +20,7 @@ test("three browsers play, recover, reset, and end a room", async ({
     const url = host.url();
     const code = url.split("/").at(-1)!;
     await expect(
-      host.getByText("Connected", { exact: true }).first(),
+      host.getByText("Open buzzing to start", { exact: true }),
     ).toBeVisible();
     await expect(host.getByRole("button", { name: "Buzz in" })).toBeDisabled();
 
@@ -38,9 +38,11 @@ test("three browsers play, recover, reset, and end a room", async ({
       .getByRole("button", { name: "Join room", exact: true })
       .click();
     await expect(second.getByRole("button", { name: "Buzz in" })).toBeVisible();
-    await expect(host.getByRole("region", { name: "Players" })).toContainText(
-      "Jules",
-    );
+    await host.getByRole("button", { name: "Participants (3)" }).click();
+    await expect(
+      host.getByRole("list", { name: "Participants" }),
+    ).toContainText("Jules");
+    await host.getByRole("button", { name: "Close participants" }).click();
 
     await host.getByRole("button", { name: "Open buzzing" }).click();
     await expect(guest.getByRole("button", { name: "Buzz in" })).toBeEnabled();
@@ -66,12 +68,12 @@ test("three browsers play, recover, reset, and end a room", async ({
       guest.getByRole("region", { name: "Host controls" }),
     ).toHaveCount(0);
 
-    await host.getByRole("button", { name: "Reset for next question" }).click();
+    await host.getByRole("button", { name: "Next round" }).click();
     await expect(guest.getByRole("button", { name: "Buzz in" })).toBeEnabled();
     await host.getByRole("button", { name: "Lock buzzing" }).click();
     await expect(guest.getByRole("button", { name: "Buzz in" })).toBeDisabled();
     await expect(guest.getByText("Buzzing is locked")).toBeVisible();
-    await host.getByRole("button", { name: "Reset for next question" }).click();
+    await host.getByRole("button", { name: "Next round" }).click();
 
     await guestContext.setOffline(true);
     await expect(guest.getByRole("button", { name: "Buzz in" })).toBeDisabled();
@@ -86,6 +88,7 @@ test("three browsers play, recover, reset, and end a room", async ({
     expect((await new AxeBuilder({ page: host }).analyze()).violations).toEqual(
       [],
     );
+    await host.getByRole("button", { name: "Room menu" }).click();
     await host.getByRole("button", { name: "End room", exact: true }).click();
     await host.getByRole("button", { name: "End room for everyone" }).click();
     for (const page of [host, guest, second])
