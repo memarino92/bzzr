@@ -1,6 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useHandedness } from "../hooks/useHandedness";
+import { PlayMenu } from "./PlayMenu";
+import { ParticipantDrawer } from "./ParticipantDrawer";
 import type { RoomSnapshot } from "../../domain/protocol";
 import type { Connection } from "./RoomView";
 
@@ -9,6 +11,7 @@ export interface PlayViewProps {
   you: string;
   connection: Connection;
   pending?: boolean;
+  rememberHandedness?: boolean;
   onBuzz: () => void;
 }
 
@@ -17,9 +20,10 @@ export function PlayView({
   you,
   connection,
   pending = false,
+  rememberHandedness = true,
   onBuzz,
 }: PlayViewProps) {
-  const [leftHanded, setLeftHanded] = useState(false);
+  const [leftHanded, toggleHandedness] = useHandedness(rememberHandedness);
   const connected = connection === "connected";
   const position = room.buzzes.find((buzz) => buzz.playerId === you)?.position;
   const disabled =
@@ -39,14 +43,28 @@ export function PlayView({
             : "Waiting for the host";
 
   return (
-    <div className="mx-auto flex min-h-[calc(100svh-3rem)] w-full max-w-3xl flex-col bg-zinc-50 text-zinc-950 dark:bg-zinc-950 dark:text-white">
-      <header className="flex items-center justify-between gap-3 border-b-2 border-zinc-950 px-4 py-3 dark:border-zinc-500">
-        <h1 className="font-mono text-sm font-bold">Room {room.code}</h1>
-        <span className="text-sm font-bold">Round {room.round}</span>
+    <div className="mx-auto flex h-[calc(100dvh-3rem)] w-full max-w-3xl flex-col bg-zinc-50 text-zinc-950 scheme-light dark:bg-zinc-950 dark:text-white dark:scheme-dark">
+      <header className="flex shrink-0 items-center justify-between gap-3 border-b-2 border-zinc-950 px-4 py-3 dark:border-zinc-500">
+        <a
+          href="/"
+          aria-label="bzzr home"
+          className="grid size-10 -rotate-6 place-items-center border-2 border-zinc-950 bg-lime-300 text-xl font-black text-zinc-950 shadow-pink focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-blue-600"
+        >
+          b.
+        </a>
+        <div className="text-center">
+          <h1 className="font-mono text-sm font-bold">{room.code}</h1>
+          <p className="mt-1 text-xs">Round {room.round}</p>
+        </div>
+        <PlayMenu
+          code={room.code}
+          leftHanded={leftHanded}
+          onToggle={toggleHandedness}
+        />
       </header>
 
-      <main className="flex flex-1 flex-col">
-        <div className="flex items-center justify-between gap-3 px-4 py-3">
+      <main className="flex min-h-0 flex-1 flex-col">
+        <div className="flex shrink-0 items-center justify-between gap-3 px-4 py-3">
           <p role="status" className="text-sm font-bold">
             {status}
           </p>
@@ -55,28 +73,25 @@ export function PlayView({
           </span>
         </div>
 
-        <div className="grid min-h-72 flex-1 grid-cols-2 border-y-2 border-zinc-950 dark:border-zinc-500">
+        <div className="grid min-h-0 flex-1 grid-cols-2 border-y-2 border-zinc-950 dark:border-zinc-500">
           <section
             aria-label="Results"
-            className={`flex min-w-0 flex-col p-3 ${leftHanded ? "col-start-2 row-start-1" : "col-start-1 row-start-1"}`}
+            // The entire results half is the keyboard-accessible scroll region.
+            // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
+            tabIndex={0}
+            className={`flex min-h-0 min-w-0 flex-col overflow-y-auto overscroll-contain [scrollbar-width:thin] focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-blue-600 ${leftHanded ? "col-start-2 row-start-1" : "col-start-1 row-start-1"}`}
           >
-            <h2 className="mb-3 text-xs font-black uppercase tracking-widest">
+            <h2 className="sticky top-0 z-10 shrink-0 bg-zinc-50 p-3 text-xs font-black uppercase tracking-widest dark:bg-zinc-950">
               Buzz order
             </h2>
             {room.buzzes.length === 0 ? (
-              <p className="my-auto text-sm text-zinc-600 dark:text-zinc-400">
+              <p className="my-auto p-3 text-sm text-zinc-600 dark:text-zinc-400">
                 No buzzes yet.
                 <br />
                 First spot’s yours.
               </p>
             ) : (
-              <ol
-                aria-label="Buzz order"
-                // Keyboard users need to focus this independently scrolling list.
-                // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
-                tabIndex={0}
-                className="max-h-[55svh] space-y-2 overflow-y-auto overscroll-contain focus-visible:outline-2 focus-visible:outline-blue-600"
-              >
+              <ol aria-label="Buzz order" className="space-y-2 px-3 pb-3">
                 {room.buzzes.map((buzz) => (
                   <li
                     key={buzz.playerId}
@@ -131,67 +146,7 @@ export function PlayView({
           </div>
         </div>
 
-        <button
-          type="button"
-          role="switch"
-          aria-checked={leftHanded}
-          onClick={() => setLeftHanded(!leftHanded)}
-          className="flex min-h-20 w-full items-center justify-between gap-3 border-b-2 border-zinc-950 px-4 py-4 text-left focus-visible:outline-4 focus-visible:outline-offset-[-4px] focus-visible:outline-blue-600 dark:border-zinc-500"
-        >
-          <span className="text-sm font-bold">Left-handed mode</span>
-          <span
-            aria-hidden="true"
-            className={`flex h-11 w-24 shrink-0 items-center border-2 border-zinc-950 p-1 dark:border-zinc-400 ${leftHanded ? "flex-row-reverse bg-lime-300" : "bg-zinc-200 dark:bg-zinc-800"}`}
-          >
-            <span className="h-full w-8 border-2 border-zinc-950 bg-white" />
-            <span
-              className={`flex-1 text-center font-mono text-xs font-black ${leftHanded ? "text-zinc-950" : ""}`}
-            >
-              {leftHanded ? "ON" : "OFF"}
-            </span>
-          </span>
-        </button>
-
-        <details className="group border-b-2 border-zinc-950 dark:border-zinc-500">
-          <summary className="flex min-h-16 cursor-pointer list-none items-center justify-between gap-3 px-4 py-4 text-sm font-bold focus-visible:outline-4 focus-visible:outline-offset-[-4px] focus-visible:outline-blue-600 [&::-webkit-details-marker]:hidden">
-            <span>Participants ({room.players.length})</span>
-            <svg
-              aria-hidden="true"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.5"
-              className="size-6 group-open:rotate-180"
-            >
-              <path d="m6 9 6 6 6-6" />
-            </svg>
-          </summary>
-          <ul
-            aria-label="Participants"
-            // Keyboard users need to focus the drawer's scrolling content.
-            // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
-            tabIndex={0}
-            className="max-h-60 divide-y divide-zinc-300 overflow-y-auto px-4 pb-4 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-blue-600 dark:divide-zinc-700"
-          >
-            {room.players.map((player) => (
-              <li
-                key={player.id}
-                className="flex items-start justify-between gap-3 py-3 text-sm"
-              >
-                <span className="min-w-0 break-words font-bold">
-                  {player.name}
-                  {player.id === you ? " (you)" : ""}
-                  {player.isHost && (
-                    <span className="block text-xs font-normal">Host</span>
-                  )}
-                </span>
-                <span className="text-xs text-zinc-600 dark:text-zinc-400">
-                  {player.online ? "Online" : "Offline"}
-                </span>
-              </li>
-            ))}
-          </ul>
-        </details>
+        <ParticipantDrawer players={room.players} you={you} />
       </main>
     </div>
   );

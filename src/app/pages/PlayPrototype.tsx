@@ -17,6 +17,16 @@ const demoRoom: RoomSnapshot = {
   buzzes: [{ playerId: "alex", position: 1 }],
 };
 
+const longNames: Record<string, string> = {
+  Alex: "Alexander the Quizmaster",
+  Sam: "Sam the Lightning Legend",
+  Jules: "JulesKnowsAllTheAnswers",
+  Riley: "Riley the Quick Thinker",
+  Morgan: "Morgan McTrivia-Williams",
+  Casey: "CaseyTheBuzzerDestroyer",
+  Jordan: "Jordan Lightning-Fingers",
+};
+
 const largeDemoRoom: RoomSnapshot = {
   ...demoRoom,
   players: [
@@ -46,7 +56,7 @@ const largeDemoRoom: RoomSnapshot = {
     "Sage",
   ].map((name, index) => ({
     id: name.toLowerCase(),
-    name,
+    name: longNames[name] ?? name,
     isHost: index === 0,
     online: true,
   })),

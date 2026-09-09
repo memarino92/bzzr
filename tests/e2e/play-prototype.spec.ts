@@ -10,16 +10,107 @@ test("two dozen players fit in scrollable results and the participant drawer", a
   await page.getByRole("button", { name: "Buzz in" }).click();
   await expect(page.getByRole("status")).toHaveText("You’re #24");
   await expect(results.getByRole("listitem")).toHaveCount(24);
-  await results.focus();
+  await page.getByRole("region", { name: "Results" }).focus();
   await page.keyboard.press("End");
   await expect(results.getByText("You", { exact: true })).toBeInViewport();
   await page.getByText("Participants (24)").click();
+  const drawer = page.getByRole("dialog", { name: "Participants (24)" });
+  await expect(drawer).toBeVisible();
+  const panel = await page
+    .getByRole("heading", { name: "Participants (24)" })
+    .boundingBox();
+  expect(panel!.y).toBeLessThan(page.viewportSize()!.height / 2);
+  expect(
+    await page.evaluate(
+      () => getComputedStyle(document.documentElement).overflow,
+    ),
+  ).toBe("hidden");
   await expect(
     page.getByRole("list", { name: "Participants" }).getByRole("listitem"),
   ).toHaveCount(24);
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+  await page.getByRole("button", { name: "Close participants" }).click();
   await page.getByRole("button", { name: "New round" }).click();
   await expect(page.getByText("Participants (24)")).toBeVisible();
+});
+
+test("room menu copies the code and dismisses with Escape", async ({
+  page,
+  context,
+}) => {
+  await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+  await page.goto("/prototype/play");
+  await expect(page.getByRole("link", { name: "bzzr home" })).toBeVisible();
+  await page.getByRole("button", { name: "Room menu" }).click();
+  await page.getByRole("button", { name: "Copy room code" }).click();
+  await expect(
+    page.getByRole("button", { name: "Room code copied ✓" }),
+  ).toBeVisible();
+  expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(
+    "DEMO23",
+  );
+  await page.getByRole("button", { name: "Copy room link" }).click();
+  await expect(
+    page.getByRole("button", { name: "Room link copied ✓" }),
+  ).toBeVisible();
+  expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(
+    new URL("/room/DEMO23", page.url()).href,
+  );
+  await page.keyboard.press("Escape");
+  await expect(page.getByRole("button", { name: "Room menu" })).toBeFocused();
+});
+
+test("room menu works when clipboard and local storage are blocked", async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    Storage.prototype.getItem = () => {
+      throw new Error("Storage blocked");
+    };
+    Storage.prototype.setItem = () => {
+      throw new Error("Storage blocked");
+    };
+    Object.defineProperty(navigator, "clipboard", {
+      value: {
+        writeText: async () => {
+          throw new Error("Clipboard blocked");
+        },
+      },
+    });
+  });
+  await page.goto("/prototype/play");
+  await page.getByRole("button", { name: "Room menu" }).click();
+  const toggle = page.getByRole("switch", { name: "Left-handed mode" });
+  await toggle.click();
+  await expect(toggle).toBeChecked();
+  await page.getByRole("button", { name: "Copy room code" }).click();
+  await expect(page.getByLabel("Copy this room code")).toHaveValue("DEMO23");
+});
+
+test("social metadata and favicon assets are available in the built app", async ({
+  page,
+  request,
+}) => {
+  await page.goto("/");
+  await expect(page.locator('meta[property="og:image"]')).toHaveAttribute(
+    "content",
+    "https://bzzr.app/social-card.png",
+  );
+  await expect(page.locator('meta[name="twitter:card"]')).toHaveAttribute(
+    "content",
+    "summary_large_image",
+  );
+  for (const path of [
+    "/favicon.svg",
+    "/favicon.ico",
+    "/apple-touch-icon.png",
+    "/social-card.png",
+    "/social-square.png",
+  ]) {
+    const response = await request.get(path);
+    expect(response.ok()).toBe(true);
+    expect(response.headers()["content-type"]).toContain("image/");
+  }
 });
 
 test("play prototype swaps sides, discloses participants, and plays another round", async ({
@@ -31,6 +122,7 @@ test("play prototype swaps sides, discloses participants, and plays another roun
   const participants = page.getByRole("list", { name: "Participants" });
   const toggle = page.getByRole("switch", { name: "Left-handed mode" });
   await expect(participants).not.toBeVisible();
+  await page.getByRole("button", { name: "Room menu" }).click();
   await expect(toggle).not.toBeChecked();
   expect((await buzzer.boundingBox())!.x).toBeGreaterThan(
     (await results.boundingBox())!.x,
@@ -38,13 +130,18 @@ test("play prototype swaps sides, discloses participants, and plays another roun
   await toggle.focus();
   await page.keyboard.press("Space");
   await expect(toggle).toBeChecked();
+  await page.keyboard.press("Escape");
+  await page.reload();
+  await page.getByRole("button", { name: "Room menu" }).click();
+  await expect(toggle).toBeChecked();
+  await page.keyboard.press("Escape");
   expect((await buzzer.boundingBox())!.x).toBeLessThan(
     (await results.boundingBox())!.x,
   );
   await page.getByText("Participants (3)").click();
   await expect(participants).toBeVisible();
   await expect(participants.getByRole("listitem")).toHaveCount(3);
-  await page.getByText("Participants (3)").click();
+  await page.getByRole("button", { name: "Close participants" }).click();
   await expect(participants).not.toBeVisible();
   await buzzer.click();
   await expect(buzzer).toBeDisabled();
@@ -52,7 +149,9 @@ test("play prototype swaps sides, discloses participants, and plays another roun
   await expect(results.getByRole("listitem")).toHaveCount(2);
   await page.getByRole("button", { name: "New round" }).click();
   await expect(buzzer).toBeEnabled();
+  await page.getByRole("button", { name: "Room menu" }).click();
   await expect(toggle).toBeChecked();
+  await page.keyboard.press("Escape");
   await expect(
     results.getByText("No buzzes yet.", { exact: false }),
   ).toBeVisible();

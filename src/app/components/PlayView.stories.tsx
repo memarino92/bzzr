@@ -7,7 +7,13 @@ const meta = {
   title: "Prototype/Play",
   component: PlayView,
   parameters: { layout: "fullscreen" },
-  args: { room: sampleRoom, you: "sam", connection: "connected", onBuzz: fn() },
+  args: {
+    room: sampleRoom,
+    you: "sam",
+    connection: "connected",
+    rememberHandedness: false,
+    onBuzz: fn(),
+  },
 } satisfies Meta<typeof PlayView>;
 export default meta;
 type Story = StoryObj<typeof meta>;
@@ -23,11 +29,15 @@ export const Ready: Story = {
 export const Results: Story = { args: { room: resultsRoom } };
 export const LeftHanded: Story = {
   play: async ({ canvasElement }) => {
+    await userEvent.click(
+      within(canvasElement).getByRole("button", { name: "Room menu" }),
+    );
     const control = within(canvasElement).getByRole("switch", {
       name: "Left-handed mode",
     });
     await userEvent.click(control);
     await expect(control).toBeChecked();
+    await userEvent.keyboard("{Escape}");
   },
 };
 export const ParticipantsOpen: Story = {
@@ -35,7 +45,9 @@ export const ParticipantsOpen: Story = {
     const canvas = within(canvasElement);
     await userEvent.click(canvas.getByText("Participants (4)"));
     await expect(
-      canvas.getByRole("list", { name: "Participants" }),
+      within(canvasElement.ownerDocument.body).getByRole("list", {
+        name: "Participants",
+      }),
     ).toBeVisible();
   },
 };
@@ -64,5 +76,13 @@ export const FullRoom: Story = {
         position: i + 1,
       })),
     },
+  },
+};
+
+export const MenuOpen: Story = {
+  play: async ({ canvasElement }) => {
+    await userEvent.click(
+      within(canvasElement).getByRole("button", { name: "Room menu" }),
+    );
   },
 };
