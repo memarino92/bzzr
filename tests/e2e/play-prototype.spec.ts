@@ -68,11 +68,11 @@ test("two dozen players fit in scrollable results and the participant drawer", a
   await page.getByRole("region", { name: "Results" }).focus();
   await page.keyboard.press("End");
   await expect(results.getByText("You", { exact: true })).toBeInViewport();
-  await page.getByText("Participants (24)").click();
-  const drawer = page.getByRole("dialog", { name: "Participants (24)" });
+  await page.getByText("Players (24)").click();
+  const drawer = page.getByRole("dialog", { name: "Players (24)" });
   await expect(drawer).toBeVisible();
   const panel = await page
-    .getByRole("heading", { name: "Participants (24)" })
+    .getByRole("heading", { name: "Players (24)" })
     .boundingBox();
   expect(panel!.y).toBeLessThan(page.viewportSize()!.height / 2);
   expect(
@@ -81,12 +81,12 @@ test("two dozen players fit in scrollable results and the participant drawer", a
     ),
   ).toBe("hidden");
   await expect(
-    page.getByRole("list", { name: "Participants" }).getByRole("listitem"),
+    page.getByRole("list", { name: "Players" }).getByRole("listitem"),
   ).toHaveCount(24);
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
-  await page.getByRole("button", { name: "Close participants" }).click();
+  await page.getByRole("button", { name: "Close players" }).click();
   await page.getByRole("button", { name: "New round" }).click();
-  await expect(page.getByText("Participants (24)")).toBeVisible();
+  await expect(page.getByText("Players (24)")).toBeVisible();
 });
 
 test("room menu copies the code and dismisses with Escape", async ({
@@ -177,7 +177,7 @@ test("play prototype swaps sides, discloses participants, and plays another roun
   await page.goto("/prototype/play");
   const buzzer = page.getByRole("button", { name: "Buzz in" });
   const results = page.getByRole("region", { name: "Results" });
-  const participants = page.getByRole("list", { name: "Participants" });
+  const participants = page.getByRole("list", { name: "Players" });
   const toggle = page.getByRole("switch", { name: "Left-handed mode" });
   await expect(participants).not.toBeVisible();
   await page.getByRole("button", { name: "Room menu" }).click();
@@ -196,10 +196,10 @@ test("play prototype swaps sides, discloses participants, and plays another roun
   expect((await buzzer.boundingBox())!.x).toBeLessThan(
     (await results.boundingBox())!.x,
   );
-  await page.getByText("Participants (3)").click();
+  await page.getByText("Players (3)").click();
   await expect(participants).toBeVisible();
   await expect(participants.getByRole("listitem")).toHaveCount(3);
-  await page.getByRole("button", { name: "Close participants" }).click();
+  await page.getByRole("button", { name: "Close players" }).click();
   await expect(participants).not.toBeVisible();
   await buzzer.click();
   await expect(buzzer).toBeDisabled();

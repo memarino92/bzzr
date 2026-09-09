@@ -38,11 +38,11 @@ test("three browsers play, recover, reset, and end a room", async ({
       .getByRole("button", { name: "Join room", exact: true })
       .click();
     await expect(second.getByRole("button", { name: "Buzz in" })).toBeVisible();
-    await host.getByRole("button", { name: "Participants (3)" }).click();
-    await expect(
-      host.getByRole("list", { name: "Participants" }),
-    ).toContainText("Jules");
-    await host.getByRole("button", { name: "Close participants" }).click();
+    await host.getByRole("button", { name: "Players (3)" }).click();
+    await expect(host.getByRole("list", { name: "Players" })).toContainText(
+      "Jules",
+    );
+    await host.getByRole("button", { name: "Close players" }).click();
 
     await host.getByRole("button", { name: "Open buzzing" }).click();
     await expect(guest.getByRole("button", { name: "Buzz in" })).toBeEnabled();

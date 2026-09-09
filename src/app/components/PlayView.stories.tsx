@@ -63,13 +63,13 @@ export const LeftHanded: Story = {
     await userEvent.keyboard("{Escape}");
   },
 };
-export const ParticipantsOpen: Story = {
+export const PlayersOpen: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    await userEvent.click(canvas.getByText("Participants (4)"));
+    await userEvent.click(canvas.getByText("Players (4)"));
     await expect(
       within(canvasElement.ownerDocument.body).getByRole("list", {
-        name: "Participants",
+        name: "Players",
       }),
     ).toBeVisible();
   },

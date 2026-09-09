@@ -27,7 +27,7 @@ export function ParticipantDrawer({
         onClick={() => setOpen(true)}
         className="flex min-h-16 w-full shrink-0 items-center justify-between gap-3 border-b-2 border-zinc-950 px-4 py-4 text-sm font-bold focus-visible:outline-4 focus-visible:outline-offset-[-4px] focus-visible:outline-blue-600 dark:border-zinc-500"
       >
-        <span>Participants ({players.length})</span>
+        <span>Players ({players.length})</span>
         <svg
           aria-hidden="true"
           viewBox="0 0 24 24"
@@ -47,11 +47,11 @@ export function ParticipantDrawer({
         >
           <div className="flex shrink-0 items-center justify-between gap-3 border-b-2 border-zinc-950 px-4 py-3 dark:border-zinc-500">
             <DialogTitle className="text-base font-black">
-              Participants ({players.length})
+              Players ({players.length})
             </DialogTitle>
             <button
               type="button"
-              aria-label="Close participants"
+              aria-label="Close players"
               onClick={() => setOpen(false)}
               className="grid size-11 place-items-center border-2 border-zinc-950 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 dark:border-zinc-400"
             >
@@ -68,7 +68,7 @@ export function ParticipantDrawer({
             </button>
           </div>
           <ul
-            aria-label="Participants"
+            aria-label="Players"
             // The drawer has one keyboard-accessible scroll area.
             // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
             tabIndex={0}

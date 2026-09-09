@@ -66,13 +66,13 @@ it("discloses players, remembers preferences, and offers no host action to a pla
       onRetry={vi.fn()}
     />,
   );
-  await user.click(screen.getByRole("button", { name: "Participants (4)" }));
+  await user.click(screen.getByRole("button", { name: "Players (4)" }));
   expect(
-    within(screen.getByRole("list", { name: "Participants" })).getAllByRole(
+    within(screen.getByRole("list", { name: "Players" })).getAllByRole(
       "listitem",
     ),
   ).toHaveLength(4);
-  await user.click(screen.getByRole("button", { name: "Close participants" }));
+  await user.click(screen.getByRole("button", { name: "Close players" }));
   await user.click(screen.getByRole("switch", { name: "Dark mode" }));
   expect(localStorage.getItem("bzzr:theme")).toBe("dark");
   await user.click(screen.getByRole("button", { name: "Room menu" }));
