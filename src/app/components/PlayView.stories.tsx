@@ -4,7 +4,7 @@ import { PlayView } from "./PlayView";
 import { sampleRoom, resultsRoom } from "./fixtures";
 
 const meta = {
-  title: "Prototype/Play",
+  title: "Game/Play",
   component: PlayView,
   parameters: { layout: "fullscreen" },
   args: {
@@ -108,4 +108,29 @@ export const MenuOpen: Story = {
       within(canvasElement).getByRole("button", { name: "Room menu" }),
     );
   },
+};
+
+const checkBuzzerBounds: Story["play"] = async ({ canvasElement }) => {
+  const canvas = within(canvasElement);
+  const button = canvas.getByRole("button", { name: "Buzz in" });
+  const bounds = button.getBoundingClientRect();
+  const results = canvas
+    .getByRole("region", { name: "Results" })
+    .getBoundingClientRect();
+  await expect(bounds.top).toBeGreaterThanOrEqual(results.top + 8);
+  await expect(bounds.bottom + 8).toBeLessThanOrEqual(results.bottom);
+  await expect(Math.abs(bounds.width - bounds.height)).toBeLessThan(2);
+  await expect(button.scrollWidth).toBeLessThanOrEqual(button.clientWidth);
+};
+export const Mobile: Story = {
+  globals: { viewport: { value: "mobile", isRotated: false } },
+  play: checkBuzzerBounds,
+};
+export const ShortWide: Story = {
+  globals: { viewport: { value: "shortWide", isRotated: false } },
+  play: checkBuzzerBounds,
+};
+export const ShortWideHost: Story = {
+  ...ShortWide,
+  args: { you: "alex", onHostCommand: fn() },
 };

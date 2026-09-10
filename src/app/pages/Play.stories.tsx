@@ -1,4 +1,4 @@
-"use client";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { useState } from "react";
 import { PlayView } from "../components/PlayView";
@@ -67,7 +67,7 @@ largeDemoRoom.buzzes = largeDemoRoom.players
   .filter((player) => player.id !== "sam")
   .map((player, index) => ({ playerId: player.id, position: index + 1 }));
 
-export function PlayPrototype({
+function PlayExample({
   playerCount = 3,
   host = false,
 }: {
@@ -85,10 +85,10 @@ export function PlayPrototype({
   return (
     <>
       <aside
-        aria-label="Prototype controls"
+        aria-label="Example controls"
         className="mx-auto flex min-h-12 max-w-3xl items-center justify-between gap-3 bg-zinc-950 px-4 py-2 text-xs text-white"
       >
-        <span>Prototype · {host ? "host" : "simulated round"}</span>
+        <span>Example · {host ? "host" : "simulated round"}</span>
         <button
           type="button"
           className="min-h-8 px-2 font-bold underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-lime-300 disabled:opacity-40"
@@ -135,6 +135,7 @@ export function PlayPrototype({
         </div>
       ) : (
         <PlayView
+          rememberHandedness={false}
           demo
           room={room}
           you={you}
@@ -177,3 +178,17 @@ export function PlayPrototype({
     </>
   );
 }
+
+const meta = {
+  title: "Pages/Play examples",
+  component: PlayExample,
+  parameters: { layout: "fullscreen" },
+} satisfies Meta<typeof PlayExample>;
+export default meta;
+export const ThreePlayers: StoryObj<typeof meta> = {};
+export const TwentyFourPlayers: StoryObj<typeof meta> = {
+  args: { playerCount: 24 },
+};
+export const Host: StoryObj<typeof meta> = {
+  args: { host: true, playerCount: 24 },
+};

@@ -5,6 +5,25 @@ const preview: Preview = {
   tags: ["autodocs"],
   parameters: {
     layout: "padded",
+    viewport: {
+      options: {
+        mobile: {
+          name: "Mobile (390 × 844)",
+          styles: { width: "390px", height: "844px" },
+          type: "mobile",
+        },
+        shortWide: {
+          name: "Short wide (844 × 390)",
+          styles: { width: "844px", height: "390px" },
+          type: "mobile",
+        },
+        desktop: {
+          name: "Desktop (1280 × 800)",
+          styles: { width: "1280px", height: "800px" },
+          type: "desktop",
+        },
+      },
+    },
     a11y: { test: "error" },
     backgrounds: {
       options: {

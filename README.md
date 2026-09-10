@@ -60,7 +60,9 @@ pnpm verify                            # full release-candidate verification
 ```
 
 Storybook includes host/player views, waiting/open/locked rounds, results,
-reconnections, errors, long names, a full room, and a playable local round.
+reconnections, errors, long names, a full room, and playable fictional rounds.
+Dedicated room-menu and switch stories include keyboard interactions. Mobile and
+short-wide play stories select explicit viewports and check buzzer containment.
 The [visual direction](docs/design.md) brings a little 1990s game-night energy.
 CI retains a downloadable static Storybook and test reports.
 [Testing scope and limitations](docs/testing.md) · [Initial verification record](docs/verification.md)

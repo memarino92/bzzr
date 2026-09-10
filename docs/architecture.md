@@ -29,7 +29,7 @@ flowchart LR
 RedwoodSDK renders a small server shell and hydrates client forms/room controls.
 Storybook renders the same presentation components without a server or real room.
 Live RoomClient passes snapshots and command callbacks through RoomView to PlayView.
-The local prototype supplies simulated state to that same presentation. Browser hooks
+Storybook examples supply simulated state to that same presentation. Browser hooks
 keep appearance and handedness preferences on the device; they never affect room
 roles, rounds, or buzz order. See [ADR 0005](decisions/0005-mobile-play.md).
 
