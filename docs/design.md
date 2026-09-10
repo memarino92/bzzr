@@ -16,19 +16,10 @@ unchanged by this presentation update.
 
 ## Live play and local demos
 
-Open `/prototype/play` for a separate, deterministic local demo. It uses three
-fictional participants and simulates a buzz locally; it does not join a live room.
-Live `/room/:code` pages now use the same phone-first layout, connected to the real room authority. The demo route remains available for trying fictional room states.
-Use `/prototype/play?players=24` to preview two dozen participants, with 23
-already in the buzz order and your buzzer ready to take the final spot.
-Several demo names approach the 24-character limit, including unbroken names,
-to exercise wrapping in the results column and participant drawer.
-Add `&host=1` (or use `/prototype/play?host=1`) for the host view. It starts with
-buzzing closed and adds a compact Open buzzing / Next round and Lock buzzing
-control bar. End room is available only to hosts in the hamburger menu, with a
-confirmation dialog. The host can buzz too. Sample buzzes simulates the other
-participants; ending requires confirmation and Restart demo restores the fixture.
-These are local demo transitions, not live room authority or authorization.
+Live rooms use the phone-first play layout. Storybook's Pages/Play examples contains
+interactive, fictional three-player, 24-player, and host stories. Simulation controls
+exist only in those stories; the application exposes no simulated-room route.
+The host example supports opening, sample buzzes, locking, reset, and confirmed end.
 
 The live and demo views give equal screen width to buzz order and a large circular lime buzzer
 with a raised edge and pressed feedback. Left-handed mode swaps the two columns without resetting the round or
@@ -53,7 +44,7 @@ Without a saved choice, CSS continues to follow the system, including when
 JavaScript is unavailable. Blocked storage still allows switching the current
 page, but cannot preserve the choice after closing or reloading it.
 
-Storybook's Prototype/Play stories cover results, empty rounds, sending, locked,
+Storybook's Game/Play stories cover results, empty rounds, sending, locked,
 waiting, connection loss, handedness, the drawer, and a full room with long names.
 Pages/Room stories cover the same layout with live connection states, host absence,
 errors, and retry controls. Live rooms fill the viewport; only the demo reserves
@@ -71,3 +62,5 @@ Open Graph and Twitter metadata reference the public `https://bzzr.app` card.
 The metadata is generic, including on room pages, and contains no participant
 names or private room data. Social crawlers will receive the new image after
 deployment; their caches may need refreshing.
+
+Storybook offers Mobile (390 × 844), Short wide (844 × 390), and Desktop (1280 × 800) viewports. Game/Play includes fixed mobile and short-wide stories, including host controls, with buzzer containment assertions. The buzzer sizes against both available width and height. Game/Room menu and Game/Handedness switch expose the controls independently.

@@ -4,7 +4,10 @@ test("theme follows the system until the first choice, then remembers the overri
   page,
 }) => {
   await page.emulateMedia({ colorScheme: "light" });
-  await page.goto("/prototype/play");
+  await page.goto("/");
+  await page.getByLabel("Your name").fill("Alex");
+  await page.getByRole("button", { name: "Create a room" }).click();
+  await expect(page).toHaveURL(/\/room\/[A-Z2-9]{6}$/);
   const control = page.getByRole("switch", { name: "Dark mode", exact: true });
   await expect(control).not.toBeChecked();
   expect(
@@ -27,6 +30,9 @@ test("theme follows the system until the first choice, then remembers the overri
   await page.emulateMedia({ colorScheme: "dark" });
   await expect(control).not.toBeChecked();
   await page.reload();
+  await expect(
+    page.getByRole("button", { name: "Open buzzing" }),
+  ).toBeEnabled();
   await expect(control).not.toBeChecked();
   await expect(page.locator("body")).toHaveCSS("color-scheme", "light");
 
@@ -65,7 +71,10 @@ test("theme remains switchable when browser storage is unavailable", async ({
       throw new Error("Storage blocked");
     };
   });
-  await page.goto("/prototype/play");
+  await page.goto("/");
+  await page.getByLabel("Your name").fill("Alex");
+  await page.getByRole("button", { name: "Create a room" }).click();
+  await expect(page).toHaveURL(/\/room\/[A-Z2-9]{6}$/);
   const control = page.getByRole("switch", { name: "Dark mode", exact: true });
   await control.click();
   await expect(control).toBeChecked();

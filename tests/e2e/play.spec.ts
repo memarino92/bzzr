@@ -1,10 +1,12 @@
 import { expect, test } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 
-test("host prototype opens, fills, locks, resets, and ends a room", async ({
+test("host example opens, fills, locks, resets, and ends a room", async ({
   page,
 }) => {
-  await page.goto("/prototype/play?host=1&players=24");
+  await page.goto(
+    "http://127.0.0.1:6006/iframe.html?id=pages-play-examples--host&viewMode=story",
+  );
   const buzzer = page.getByRole("button", { name: "Buzz in" });
   await expect(
     page.getByRole("region", { name: "Host controls" }),
@@ -59,7 +61,9 @@ test("host prototype opens, fills, locks, resets, and ends a room", async ({
 test("two dozen players fit in scrollable results and the participant drawer", async ({
   page,
 }) => {
-  await page.goto("/prototype/play?players=24");
+  await page.goto(
+    "http://127.0.0.1:6006/iframe.html?id=pages-play-examples--twenty-four-players&viewMode=story",
+  );
   const results = page.getByRole("list", { name: "Buzz order" });
   await expect(results.getByRole("listitem")).toHaveCount(23);
   await page.getByRole("button", { name: "Buzz in" }).click();
@@ -94,7 +98,9 @@ test("room menu copies the code and dismisses with Escape", async ({
   context,
 }) => {
   await context.grantPermissions(["clipboard-read", "clipboard-write"]);
-  await page.goto("/prototype/play");
+  await page.goto(
+    "http://127.0.0.1:6006/iframe.html?id=pages-play-examples--three-players&viewMode=story",
+  );
   await expect(page.getByRole("link", { name: "bzzr home" })).toBeVisible();
   await page.getByRole("button", { name: "Room menu" }).click();
   await expect(
@@ -136,7 +142,9 @@ test("room menu works when clipboard and local storage are blocked", async ({
       },
     });
   });
-  await page.goto("/prototype/play");
+  await page.goto(
+    "http://127.0.0.1:6006/iframe.html?id=pages-play-examples--three-players&viewMode=story",
+  );
   await page.getByRole("button", { name: "Room menu" }).click();
   const toggle = page.getByRole("switch", { name: "Left-handed mode" });
   await toggle.click();
@@ -171,10 +179,12 @@ test("social metadata and favicon assets are available in the built app", async 
   }
 });
 
-test("play prototype swaps sides, discloses participants, and plays another round", async ({
+test("play example swaps sides, discloses participants, and plays another round", async ({
   page,
 }) => {
-  await page.goto("/prototype/play");
+  await page.goto(
+    "http://127.0.0.1:6006/iframe.html?id=pages-play-examples--three-players&viewMode=story",
+  );
   const buzzer = page.getByRole("button", { name: "Buzz in" });
   const results = page.getByRole("region", { name: "Results" });
   const participants = page.getByRole("list", { name: "Players" });
@@ -189,7 +199,6 @@ test("play prototype swaps sides, discloses participants, and plays another roun
   await page.keyboard.press("Space");
   await expect(toggle).toBeChecked();
   await page.keyboard.press("Escape");
-  await page.reload();
   await page.getByRole("button", { name: "Room menu" }).click();
   await expect(toggle).toBeChecked();
   await page.keyboard.press("Escape");
@@ -213,8 +222,8 @@ test("play prototype swaps sides, discloses participants, and plays another roun
   await expect(
     results.getByText("No buzzes yet.", { exact: false }),
   ).toBeVisible();
-  await buzzer.focus();
-  await page.keyboard.press("Enter");
+  await expect(page.getByRole("button", { name: "Room menu" })).toBeFocused();
+  await buzzer.press("Enter");
   await expect(page.getByRole("status")).toHaveText("You’re #1");
   expect(
     await page.evaluate(
@@ -222,4 +231,35 @@ test("play prototype swaps sides, discloses participants, and plays another roun
     ),
   ).toBe(true);
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+});
+
+test("live room remembers handedness and fits a short wide screen", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 844, height: 390 });
+  await page.goto("/");
+  await page.getByLabel("Your name").fill("Alex");
+  await page.getByRole("button", { name: "Create a room" }).click();
+  await expect(page).toHaveURL(/\/room\/[A-Z2-9]{6}$/);
+  await page.getByRole("button", { name: "Open buzzing" }).click();
+  const buzzer = page.getByRole("button", { name: "Buzz in" });
+  const results = page.getByRole("region", { name: "Results" });
+  for (const leftHanded of [false, true]) {
+    if (leftHanded) {
+      await page.getByRole("button", { name: "Room menu" }).click();
+      await page.getByRole("switch", { name: "Left-handed mode" }).click();
+      await page.keyboard.press("Escape");
+      await page.reload();
+      await expect(buzzer).toBeEnabled();
+    }
+    const buttonBox = (await buzzer.boundingBox())!;
+    const resultsBox = (await results.boundingBox())!;
+    expect(buttonBox.y).toBeGreaterThanOrEqual(resultsBox.y + 8);
+    expect(buttonBox.y + buttonBox.height + 8).toBeLessThanOrEqual(
+      resultsBox.y + resultsBox.height,
+    );
+    expect(buttonBox.x < resultsBox.x).toBe(leftHanded);
+  }
+  await buzzer.click();
+  await expect(page.getByRole("status")).toHaveText("You’re #1");
 });

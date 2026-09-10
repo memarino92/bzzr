@@ -179,16 +179,16 @@ export function PlayView({
           </section>
 
           <div
-            className={`flex min-w-0 items-center justify-center px-3 py-6 ${leftHanded ? "col-start-1 row-start-1 border-r-2" : "col-start-2 row-start-1 border-l-2"} border-zinc-950 dark:border-zinc-500`}
+            className={`flex min-h-0 min-w-0 items-center justify-center p-3 [container-type:size] ${leftHanded ? "col-start-1 row-start-1 border-r-2" : "col-start-2 row-start-1 border-l-2"} border-zinc-950 dark:border-zinc-500`}
           >
             <button
               type="button"
               aria-label="Buzz in"
               disabled={disabled}
               onClick={onBuzz}
-              className={`flex aspect-square w-full max-w-72 shrink-0 flex-col items-center justify-center gap-2 rounded-full border-[8px] text-zinc-950 shadow-[0_8px_0_var(--color-zinc-300)] focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-blue-700 enabled:cursor-pointer enabled:active:translate-y-1 enabled:active:shadow-[0_4px_0_var(--color-zinc-300)] dark:shadow-[0_8px_0_var(--color-zinc-700)] dark:enabled:active:shadow-[0_4px_0_var(--color-zinc-700)] ${position ? "border-lime-200 bg-lime-100" : disabled ? "border-zinc-300 bg-zinc-200 text-zinc-600 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300" : "border-lime-200 bg-lime-300 enabled:hover:bg-lime-200"}`}
+              className={`flex aspect-square w-[min(100cqw,calc(100cqh-1rem),18rem)] shrink-0 flex-col items-center justify-center gap-2 rounded-full border-[8px] text-zinc-950 shadow-[0_8px_0_var(--color-zinc-300)] focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-blue-700 enabled:cursor-pointer enabled:active:translate-y-1 enabled:active:shadow-[0_4px_0_var(--color-zinc-300)] dark:shadow-[0_8px_0_var(--color-zinc-700)] dark:enabled:active:shadow-[0_4px_0_var(--color-zinc-700)] ${position ? "border-lime-200 bg-lime-100" : disabled ? "border-zinc-300 bg-zinc-200 text-zinc-600 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300" : "border-lime-200 bg-lime-300 enabled:hover:bg-lime-200"}`}
             >
-              <span className="text-2xl font-black tracking-tight sm:text-4xl">
+              <span className="text-[clamp(1rem,12cqh,2.25rem)] font-black tracking-tight">
                 {position
                   ? `#${position}`
                   : pending
@@ -199,7 +199,7 @@ export function PlayView({
                         ? "BUZZ"
                         : "Wait"}
               </span>
-              <span className="text-center text-xs font-bold sm:text-sm">
+              <span className="text-center text-[clamp(0.625rem,5cqh,0.875rem)] font-bold">
                 {position
                   ? "You’re in!"
                   : disabled

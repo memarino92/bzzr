@@ -33,10 +33,14 @@ mock Durable Object storage. They never expose a test endpoint in production.
 E2E uses the built RedwoodSDK app through Vite preview. Three independent browser
 contexts represent host and two guests. Tests exercise links, code entry, cookies,
 hydration, CSP, order, reset, lock, reload, offline/online recovery, keyboard use,
-room end, invalid rooms, and automated accessibility. Prototype journeys also cover
+room end, invalid rooms, and automated accessibility. Browser journeys against Storybook examples also cover
 24 players with long names, full-height results scrolling, modal drawers, clipboard
-fallback, saved handedness, and system versus explicit appearance preferences. Desktop and mobile Chromium
+fallback and handedness. Live-room journeys cover saved handedness, short-wide buzzer containment, and system versus explicit appearance preferences. Desktop and mobile Chromium
 configurations run; mobile emulation is not a physical-device or Safari test.
+
+The E2E runner starts both the built app and a local Storybook server.
+Fixed Storybook viewports also run in the story test runner, including geometric
+assertions that the buzzer stays inside its panel in short, wide windows.
 
 Storybook is deterministic and has no production room access. The playable story
 demonstrates UI transitions; it is not a networking test. Axe checks are useful

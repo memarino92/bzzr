@@ -3,7 +3,6 @@ import { defineApp } from "rwsdk/worker";
 import { render, route } from "rwsdk/router";
 import { Document } from "./app/Document";
 import { Home } from "./app/pages/Home";
-import { PlayPrototype } from "./app/pages/PlayPrototype";
 import { AppShell } from "./app/components/AppShell";
 import { RoomClient } from "./app/components/RoomClient";
 import { RoomNotice } from "./app/components/RoomNotice";
@@ -23,14 +22,6 @@ export default defineApp([
   route("/health", () => Response.json({ status: "ok" })),
   render(Document, [
     route("/", Home),
-    route("/prototype/play", ({ request }) => (
-      <PlayPrototype
-        host={new URL(request.url).searchParams.get("host") === "1"}
-        playerCount={
-          new URL(request.url).searchParams.get("players") === "24" ? 24 : 3
-        }
-      />
-    )),
     route("/room/:code", ({ params, response }) => {
       try {
         return <RoomClient code={normalizeCode(params.code)} />;
