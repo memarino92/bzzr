@@ -7,7 +7,7 @@ import { ApiError, postJson, readResponse } from "../lib/api-client";
 import { RoomConnection } from "../lib/room-connection";
 
 interface State {
-  phase: "loading" | "join" | "live" | "ended" | "error";
+  phase: "loading" | "join" | "live" | "ended" | "error" | "left";
   session?: SessionResponse;
   connection: Connection;
   error: string;
@@ -17,6 +17,7 @@ interface State {
   generation: number;
 }
 type Action =
+  | { type: "left" }
   | { type: "session"; session: SessionResponse }
   | { type: "connection"; connection: Connection }
   | { type: "failure"; error: string; phase?: State["phase"] }
@@ -36,6 +37,15 @@ const initial: State = {
 };
 function reducer(state: State, action: Action): State {
   switch (action.type) {
+    case "left":
+      return {
+        ...state,
+        phase: "left",
+        session: undefined,
+        busy: false,
+        pending: false,
+        error: "",
+      };
     case "session":
       return {
         ...state,
@@ -144,6 +154,11 @@ export function useRoom(code: string, spectating = false) {
       sessionLost: handleFailure,
       message: (message) => {
         clearTimeout(pendingTimer.current);
+        if (message.type === "left") {
+          transport.current?.stop();
+          dispatch({ type: "left" });
+          return;
+        }
         if (message.type === "snapshot")
           dispatch({
             type: "session",
@@ -206,5 +221,34 @@ export function useRoom(code: string, spectating = false) {
     }, 8000);
   }
 
-  return { ...state, join, send, retry: () => dispatch({ type: "retry" }) };
+  async function leave(): Promise<void> {
+    if (state.busy) return;
+    dispatch({ type: "busy" });
+    try {
+      await postJson("/api/rooms/" + code + "/leave", {});
+      clearTimeout(pendingTimer.current);
+      transport.current?.stop();
+      dispatch({ type: "left" });
+    } catch (error) {
+      if (error instanceof ApiError && [401, 404, 410].includes(error.status)) {
+        transport.current?.stop();
+        dispatch({ type: "left" });
+      } else
+        dispatch({
+          type: "failure",
+          error:
+            error instanceof Error
+              ? error.message
+              : "Could not leave the room. Try again.",
+        });
+    }
+  }
+
+  return {
+    ...state,
+    join,
+    send,
+    leave,
+    retry: () => dispatch({ type: "retry" }),
+  };
 }

@@ -89,6 +89,136 @@ afterEach(async () => {
 });
 
 describe("room Worker and Durable Object", () => {
+  it("frees a full room seat, revokes all departing sockets, and reuses the name after eviction", async () => {
+    const host = await create();
+    const guest = await join(host.code, "Sam");
+    await Promise.all(
+      Array.from({ length: LIMITS.players - 2 }, (_, i) =>
+        join(host.code, `Guest ${i}`),
+      ),
+    );
+    const first = await connect(host.code, guest.cookie);
+    const second = await connect(host.code, guest.cookie);
+    const owner = await connect(host.code, host.cookie);
+    owner.send({ type: "reset", round: 0 });
+    await first.until((m) => m.type === "snapshot" && m.room.round === 1);
+    first.send({ type: "buzz", round: 1 });
+    await owner.until(
+      (m) => m.type === "snapshot" && m.room.buzzes.length === 1,
+    );
+    await evictDurableObject(env.ROOMS.getByName(host.code));
+    const response = await api(`/api/rooms/${host.code}/leave`, {
+      method: "POST",
+      headers: { Cookie: guest.cookie },
+      body: "{}",
+    });
+    expect(response.status).toBe(200);
+    expect(response.headers.get("Set-Cookie")).toContain("Max-Age=0");
+    await first.until((m) => m.type === "left");
+    await second.until((m) => m.type === "left");
+    await owner.until(
+      (m) =>
+        m.type === "snapshot" &&
+        m.room.players.length === 59 &&
+        m.room.buzzes.length === 0,
+    );
+    expect(
+      (
+        await api(`/api/rooms/${host.code}/session`, {
+          headers: { Cookie: guest.cookie },
+        })
+      ).status,
+    ).toBe(401);
+    expect(
+      (
+        await api(`/api/rooms/${host.code}/socket`, {
+          headers: { Cookie: guest.cookie, Upgrade: "websocket" },
+        })
+      ).status,
+    ).toBe(401);
+    const replacement = await join(host.code, "Sam");
+    expect(replacement.you).not.toBe(guest.you);
+    expect(replacement.room.players).toHaveLength(60);
+  });
+  it("hands hosting to the next player and closes the room when the last player leaves", async () => {
+    const host = await create();
+    const guest = await join(host.code);
+    const owner = await connect(host.code, host.cookie);
+    const next = await connect(host.code, guest.cookie);
+    expect(
+      (
+        await api(`/api/rooms/${host.code}/leave`, {
+          method: "POST",
+          headers: { Cookie: host.cookie, Origin: "https://evil.test" },
+          body: "{}",
+        })
+      ).status,
+    ).toBe(403);
+    await api(`/api/rooms/${host.code}/leave`, {
+      method: "POST",
+      headers: { Cookie: host.cookie },
+      body: "{}",
+    });
+    await owner.until((m) => m.type === "left");
+    await next.until(
+      (m) =>
+        m.type === "snapshot" &&
+        m.room.players.some((p) => p.id === guest.you && p.isHost),
+    );
+    next.send({ type: "reset", round: 0 });
+    await next.until((m) => m.type === "snapshot" && m.room.round === 1);
+    await api(`/api/rooms/${host.code}/leave`, {
+      method: "POST",
+      headers: { Cookie: guest.cookie },
+      body: "{}",
+    });
+    await next.until((m) => m.type === "left");
+    expect(
+      (
+        await api(`/api/rooms/${host.code}/session`, {
+          headers: { Cookie: guest.cookie },
+        })
+      ).status,
+    ).toBe(404);
+    expect(
+      await runInDurableObject(
+        env.ROOMS.getByName(host.code),
+        (_instance, ctx) => ctx.storage.get("room"),
+      ),
+    ).toBeUndefined();
+  });
+  it("allows a spectator to leave without affecting the player roster", async () => {
+    const host = await create();
+    const response = await api(`/api/rooms/${host.code}/join`, {
+      method: "POST",
+      body: '{"spectator":true}',
+    });
+    const cookie = response.headers.get("Set-Cookie")!.split(";")[0]!;
+    expect(
+      (
+        await api(`/api/rooms/${host.code}/leave`, {
+          method: "POST",
+          headers: { Cookie: cookie },
+          body: "{}",
+        })
+      ).status,
+    ).toBe(200);
+    expect(
+      (
+        await api(`/api/rooms/${host.code}/leave`, {
+          method: "POST",
+          headers: { Cookie: cookie },
+          body: "{}",
+        })
+      ).status,
+    ).toBe(200);
+    const state = await runInDurableObject(
+      env.ROOMS.getByName(host.code),
+      (_instance, ctx) => ctx.storage.get<RoomState>("room"),
+    );
+    expect(state!.spectators).toHaveLength(0);
+    expect(state!.players).toHaveLength(1);
+  });
   it("spectates a full room without a name, restores after eviction, and rejects all game commands", async () => {
     const host = await create();
     await Promise.all(

@@ -54,6 +54,15 @@ afterEach(() => {
 });
 
 describe("socket transport", () => {
+  it("treats explicit departure as terminal without reconnecting", async () => {
+    connection.start();
+    latest().open();
+    latest().close(4005, "left");
+    expect(callbacks.message).toHaveBeenCalledWith({ type: "left" });
+    await vi.advanceTimersByTimeAsync(60_000);
+    expect(FakeSocket.instances).toHaveLength(1);
+    expect(fetch).not.toHaveBeenCalled();
+  });
   it("connects to a credential-free URL and waits for an authoritative snapshot", () => {
     connection.start();
     expect(latest().url.pathname).toBe("/api/rooms/ABC234/socket");

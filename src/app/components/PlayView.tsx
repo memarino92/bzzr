@@ -19,6 +19,9 @@ export interface PlayViewProps {
   onRetry?: () => void;
   onBuzz: () => void;
   onHostCommand?: (command: Command) => void;
+  onLeave?: () => void;
+  leaving?: boolean;
+  leaveDescription?: string;
 }
 
 export function PlayView({
@@ -32,6 +35,9 @@ export function PlayView({
   onRetry,
   onBuzz,
   onHostCommand,
+  onLeave,
+  leaving,
+  leaveDescription,
 }: PlayViewProps) {
   const [leftHanded, toggleHandedness] = useHandedness(rememberHandedness);
   const connected = connection === "connected";
@@ -92,6 +98,9 @@ export function PlayView({
                 : undefined
             }
             endDisabled={!connected || pending}
+            onLeave={onLeave}
+            leaving={leaving}
+            leaveDescription={leaveDescription}
           />
         </div>
       </header>

@@ -73,12 +73,15 @@ export async function handleApi(
         503,
       );
     }
-    const match = /^\/api\/rooms\/([^/]+)\/(join|session|socket)$/.exec(path);
+    const match = /^\/api\/rooms\/([^/]+)\/(join|leave|session|socket)$/.exec(
+      path,
+    );
     if (!match)
       throw new RoomError("NOT_FOUND", "That endpoint does not exist.", 404);
     const code = normalizeCode(match[1]!);
     const action = match[2]!;
-    const expectedMethod = action === "join" ? "POST" : "GET";
+    const expectedMethod =
+      action === "join" || action === "leave" ? "POST" : "GET";
     if (request.method !== expectedMethod)
       throw new RoomError(
         "METHOD_NOT_ALLOWED",
@@ -95,6 +98,7 @@ export async function handleApi(
         401,
       );
     const body = action === "join" ? await readJson(request) : undefined;
+    if (action === "leave") await readJson(request);
     const joinBody = body
       ? body.spectator === true
         ? { spectator: true }
@@ -125,6 +129,8 @@ export async function handleApi(
     outgoing.headers.set("Cache-Control", "no-store");
     if (action === "join")
       outgoing.headers.set("Set-Cookie", sessionCookie(request, code, token));
+    if (action === "leave")
+      outgoing.headers.set("Set-Cookie", sessionCookie(request, code, "", 0));
     return outgoing;
   } catch (error) {
     // Request bodies and capabilities are intentionally excluded from logs.

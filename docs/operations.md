@@ -5,8 +5,8 @@
 | Resource          | Bound                                                  |
 | ----------------- | ------------------------------------------------------ |
 | Room code         | 6 symbols, 32-symbol alphabet (30 bits)                |
-| Participants      | 60 lifetime seats, host included                       |
-| Spectators        | 120 lifetime sessions, separate from players           |
+| Participants      | 60 occupied seats, host included                       |
+| Spectators        | 120 current sessions, separate from players            |
 | Connections       | 3 per player or spectator; at most 540 per room        |
 | Name              | 24 Unicode code points                                 |
 | JSON request      | 1,024 bytes, enforced while reading the stream         |
@@ -34,7 +34,7 @@ auto-responses do not wake the room. There are no server heartbeats or sweeps.
 A single alarm handles each room's next expiry; deleteAll clears storage metadata.
 
 A changed action writes the bounded room record and sets its expiry alarm.
-Duplicate buzzes, reads, spectator joins, presence changes, and reconnects do not extend retention.
+Duplicate buzzes, reads, spectator joins, explicit departures, presence changes, and reconnects do not extend retention.
 Broadcast work is proportional to connected sockets and snapshot size; the roster
 and spectator caps bound it. Storage size does not grow with the number of played questions.
 

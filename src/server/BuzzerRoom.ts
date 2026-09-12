@@ -6,6 +6,7 @@ import {
   createRoom,
   ensureLive,
   expiresAt,
+  leaveRoom,
   snapshot,
   type Member,
   type RoomState,
@@ -108,6 +109,12 @@ export class BuzzerRoom extends DurableObject {
     for (const ws of this.ctx.getWebSockets()) {
       if (ws === except) continue;
       const attachment = ws.deserializeAttachment() as Attachment;
+      if (
+        ![...this.room.players, ...(this.room.spectators ?? [])].some(
+          (member) => member.id === attachment.playerId,
+        )
+      )
+        continue;
       this.send(ws, { type: "snapshot", room, you: attachment.playerId });
     }
   }
@@ -154,6 +161,28 @@ export class BuzzerRoom extends DurableObject {
           room: snapshot(this.room!, this.online()),
           you: player.id,
         });
+      }
+      if (path === "/leave" && request.method === "POST") {
+        if (!tokenHash || !/^[a-f0-9]{64}$/.test(tokenHash))
+          throw new RoomError("UNAUTHORIZED", "Join through bzzr.", 401);
+        if (!player) return Response.json({ ok: true });
+        const next = leaveRoom(room, player.id, Date.now());
+        if (next) await this.save(next);
+        else {
+          this.room = undefined;
+          await this.ctx.storage.deleteAll();
+        }
+        for (const ws of this.ctx.getWebSockets(player.id)) {
+          this.send(ws, { type: "left" });
+          try {
+            ws.close(4005, "left");
+          } catch {
+            /* already closed */
+          }
+        }
+        if (next) this.broadcast();
+        else await this.destroy("closed");
+        return Response.json({ ok: true });
       }
       if (!player)
         throw new RoomError(

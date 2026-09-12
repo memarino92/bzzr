@@ -5,6 +5,15 @@ must never be cached. Errors are JSON: `{ code, message }`.
 
 ## HTTP
 
+`POST /api/rooms/:code/leave` accepts `{}` and authenticates the room cookie.
+It removes that identity, returns `{ ok: true }`, and expires the cookie.
+All associated sockets receive `{ "type": "left" }` and close with code 4005;
+clients stop reconnecting. Other clients receive the updated roster and results.
+The next player in join order inherits hosting; departure of the last player
+closes the room. Removing a player also removes their buzz and renumbers the
+remaining order. A repeated leave for an already-removed identity is successful
+while the room still exists. Origin, input bounds, and rate limits still apply.
+
 The browser route `/room/:code/spectate` selects a results-only view in that tab.
 It reuses an existing session or automatically joins as a nameless spectator when
 the session endpoint returns 401. It never changes an existing player's role.

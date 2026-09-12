@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { HandednessSwitch } from "./HandednessSwitch";
 import { RoomQrDialog } from "./RoomQrDialog";
+import { LeaveRoomDialog } from "./LeaveRoomAction";
 import {
   Alert,
   AlertTitle,
@@ -18,14 +19,21 @@ export function PlayMenu({
   onToggle,
   onEnd,
   endDisabled = false,
+  onLeave,
+  leaving,
+  leaveDescription = "Your seat and current buzz will be removed.",
 }: {
   code: string;
   leftHanded: boolean;
   onToggle: () => void;
   onEnd?: () => void;
   endDisabled?: boolean;
+  onLeave?: () => void;
+  leaving?: boolean;
+  leaveDescription?: string;
 }) {
   const [confirmEnd, setConfirmEnd] = useState(false);
+  const [confirmLeave, setConfirmLeave] = useState(false);
   const [qrUrl, setQrUrl] = useState<string | null>(null);
   const [copyState, setCopyState] = useState<{
     kind: "code" | "link";
@@ -65,7 +73,7 @@ export function PlayMenu({
             <PopoverPanel
               focus
               aria-label="Room options"
-              className="absolute right-0 z-20 mt-3 w-72 max-w-[calc(100vw-2rem)] border-2 border-zinc-950 bg-white p-3 shadow-pink dark:border-zinc-400 dark:bg-zinc-900"
+              className="absolute right-0 z-20 mt-3 max-h-[calc(100dvh-8rem)] w-72 max-w-[calc(100vw-2rem)] overflow-y-auto border-2 border-zinc-950 bg-white p-3 shadow-pink dark:border-zinc-400 dark:bg-zinc-900"
             >
               {(["code", "link"] as const).map((kind) => (
                 <button
@@ -127,6 +135,19 @@ export function PlayMenu({
                   End room
                 </button>
               )}
+              {onLeave && (
+                <button
+                  type="button"
+                  disabled={leaving}
+                  onClick={() => {
+                    close();
+                    setConfirmLeave(true);
+                  }}
+                  className="min-h-12 w-full px-2 text-left text-sm font-bold text-red-700 focus-visible:outline-2 focus-visible:outline-blue-600 disabled:opacity-50 dark:text-red-400"
+                >
+                  {leaving ? "Leaving…" : "Leave room"}
+                </button>
+              )}
             </PopoverPanel>
           </>
         )}
@@ -154,6 +175,15 @@ export function PlayMenu({
         </AlertActions>
       </Alert>
       <RoomQrDialog url={qrUrl} onClose={() => setQrUrl(null)} />
+      {onLeave && (
+        <LeaveRoomDialog
+          open={confirmLeave}
+          onClose={setConfirmLeave}
+          onLeave={onLeave}
+          description={leaveDescription}
+          busy={leaving}
+        />
+      )}
     </>
   );
 }

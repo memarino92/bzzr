@@ -1,17 +1,24 @@
 import type { RoomSnapshot } from "../../domain/protocol";
 import type { Connection } from "./RoomView";
 import { ThemeToggle } from "./ThemeToggle";
+import { LeaveRoomAction } from "./LeaveRoomAction";
 
 export function SpectatorView({
   room,
   connection,
   error,
   onRetry,
+  onLeave,
+  leaving,
+  leaveDescription = "Your spectator session will be removed.",
 }: {
   room: RoomSnapshot;
   connection: Connection;
   error?: string;
   onRetry: () => void;
+  onLeave?: () => void;
+  leaving?: boolean;
+  leaveDescription?: string;
 }) {
   const connected = connection === "connected";
   return (
@@ -40,6 +47,13 @@ export function SpectatorView({
                   : "Waiting for the host"}
           </p>
           <ThemeToggle />
+          {onLeave && (
+            <LeaveRoomAction
+              onLeave={onLeave}
+              description={leaveDescription}
+              busy={leaving}
+            />
+          )}
         </div>
       </header>
       {error && (

@@ -100,6 +100,10 @@ export class RoomConnection {
     socket.onclose = (event) => {
       if (this.stopped || this.socket !== socket) return;
       this.clearHealth();
+      if (event.code === 4005) {
+        this.callbacks.message({ type: "left" });
+        return;
+      }
       if (event.code === 4004) {
         this.callbacks.message({
           type: "ended",

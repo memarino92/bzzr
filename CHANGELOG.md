@@ -4,6 +4,8 @@ Changes follow Conventional Commits. This log records user-visible milestones.
 
 ## 1.0.0 — Unreleased
 
+- Add explicit leave with immediate seat reuse, shared-tab sign-out, and host handoff.
+
 - Let hosts and players open a spectator tab without changing their playing session.
 
 - Add a large QR invitation modal to the room menu.

@@ -103,6 +103,33 @@ export function addSpectator(
   return { ...room, spectators: [...spectators, spectator] };
 }
 
+/** Explicit departure frees membership; disconnecting alone does not. */
+export function leaveRoom(
+  room: RoomState,
+  memberId: string,
+  now: number,
+): RoomState | null {
+  ensureLive(room, now);
+  const leaving = room.players.find((player) => player.id === memberId);
+  if (!leaving)
+    return {
+      ...room,
+      spectators: (room.spectators ?? []).filter(
+        (member) => member.id !== memberId,
+      ),
+    };
+  const players = room.players.filter((player) => player.id !== memberId);
+  if (!players.length) return null;
+  if (leaving.isHost) players[0] = { ...players[0]!, isHost: true };
+  return {
+    ...room,
+    players,
+    buzzes: room.buzzes
+      .filter((buzz) => buzz.playerId !== memberId)
+      .map((buzz, index) => ({ ...buzz, position: index + 1 })),
+  };
+}
+
 /** Arrival order is the order in which the room's single authority calls this. */
 export function applyCommand(
   room: RoomState,
