@@ -8,12 +8,7 @@ import {
   DialogTitle,
 } from "@headlessui/react";
 import type { Command, RoomSnapshot } from "../../domain/protocol";
-import {
-  Alert,
-  AlertTitle,
-  AlertDescription,
-  AlertActions,
-} from "./catalyst/alert";
+import { AlertTitle, AlertDescription, AlertActions } from "./catalyst/alert";
 import { Button } from "./catalyst/button";
 
 export function ParticipantDrawer({
@@ -132,46 +127,53 @@ export function ParticipantDrawer({
             ))}
           </ul>
         </DialogPanel>
-        <Alert
+        <Dialog
           key={confirmBan ? "ban" : "remove"}
           open={!!target && isHost}
           onClose={closeConfirmation}
-          className="relative z-50"
+          className="fixed inset-0 z-50"
         >
-          <AlertTitle>
-            {confirmBan
-              ? "Are you sure?"
-              : `Remove ${target?.name ?? "player"}?`}
-          </AlertTitle>
-          <AlertDescription>
-            {confirmBan
-              ? `Ban ${target?.name} from this room? They will be removed and blocked from rejoining. There is no way to undo this.`
-              : `${target?.name} will be removed from the room and their current buzz cleared. Remove lets them join again. Ban blocks them for the rest of this room.`}
-          </AlertDescription>
-          <AlertActions>
-            <Button plain data-autofocus onClick={closeConfirmation}>
-              Cancel
-            </Button>
-            {!confirmBan && (
-              <Button
-                outline
-                disabled={disabled}
-                onClick={() => moderate("remove")}
-              >
-                Remove
-              </Button>
-            )}
-            <Button
-              color="red"
-              disabled={disabled}
-              onClick={() =>
-                confirmBan ? moderate("ban") : setConfirmBan(true)
-              }
-            >
-              {confirmBan ? "Ban player" : "Ban"}
-            </Button>
-          </AlertActions>
-        </Alert>
+          <DialogBackdrop className="fixed inset-0 bg-zinc-950/60" />
+          <div className="fixed inset-0 overflow-y-auto p-4">
+            <div className="grid min-h-full place-items-center">
+              <DialogPanel className="w-full max-w-md border-2 border-zinc-950 bg-white p-6 shadow-pink scheme-light dark:border-zinc-300 dark:bg-zinc-900 dark:scheme-dark">
+                <AlertTitle>
+                  {confirmBan
+                    ? "Are you sure?"
+                    : `Remove ${target?.name ?? "player"}?`}
+                </AlertTitle>
+                <AlertDescription>
+                  {confirmBan
+                    ? `Ban ${target?.name} from this room? They will be removed and blocked from rejoining. There is no way to undo this.`
+                    : `${target?.name} will be removed from the room and their current buzz cleared. Remove lets them join again. Ban blocks them for the rest of this room.`}
+                </AlertDescription>
+                <AlertActions>
+                  <Button plain data-autofocus onClick={closeConfirmation}>
+                    Cancel
+                  </Button>
+                  {!confirmBan && (
+                    <Button
+                      outline
+                      disabled={disabled}
+                      onClick={() => moderate("remove")}
+                    >
+                      Remove
+                    </Button>
+                  )}
+                  <Button
+                    color="red"
+                    disabled={disabled}
+                    onClick={() =>
+                      confirmBan ? moderate("ban") : setConfirmBan(true)
+                    }
+                  >
+                    {confirmBan ? "Ban player" : "Ban"}
+                  </Button>
+                </AlertActions>
+              </DialogPanel>
+            </div>
+          </div>
+        </Dialog>
       </Dialog>
     </>
   );
