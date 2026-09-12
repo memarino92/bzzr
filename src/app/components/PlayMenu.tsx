@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { HandednessSwitch } from "./HandednessSwitch";
+import { RoomQrDialog } from "./RoomQrDialog";
 import {
   Alert,
   AlertTitle,
@@ -25,6 +26,7 @@ export function PlayMenu({
   endDisabled?: boolean;
 }) {
   const [confirmEnd, setConfirmEnd] = useState(false);
+  const [qrUrl, setQrUrl] = useState<string | null>(null);
   const [copyState, setCopyState] = useState<{
     kind: "code" | "link";
     status: "copied" | "manual";
@@ -93,6 +95,16 @@ export function PlayMenu({
                   />
                 </label>
               )}
+              <button
+                type="button"
+                onClick={() => {
+                  close();
+                  setQrUrl(window.location.origin + "/room/" + code);
+                }}
+                className="min-h-12 w-full px-2 text-left text-sm font-bold hover:bg-zinc-100 focus-visible:outline-2 focus-visible:outline-blue-600 dark:hover:bg-zinc-800"
+              >
+                Open QR code
+              </button>
               <HandednessSwitch leftHanded={leftHanded} onToggle={onToggle} />
               {onEnd && (
                 <button
@@ -133,6 +145,7 @@ export function PlayMenu({
           </Button>
         </AlertActions>
       </Alert>
+      <RoomQrDialog url={qrUrl} onClose={() => setQrUrl(null)} />
     </>
   );
 }

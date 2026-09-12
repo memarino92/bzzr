@@ -17,6 +17,9 @@ importers:
       clsx:
         specifier: 2.1.1
         version: 2.1.1
+      qrcode.react:
+        specifier: 4.2.0
+        version: 4.2.0(react@19.2.8)
       react:
         specifier: 19.2.8
         version: 19.2.8
@@ -3515,6 +3518,11 @@ packages:
   puppeteer-core@25.4.0:
     resolution: {integrity: sha512-K1plkLOdeoUnGeT1OvdqF3qxl33v+Ra/uH5VyPEhXdMcpvGiEskHzxxEU3fgpccJpJLIipB/rPUsvkZRWeKqOA==}
     engines: {node: '>=22.12.0'}
+
+  qrcode.react@4.2.0:
+    resolution: {integrity: sha512-QpgqWi8rD9DsS9EP3z7BT+5lY5SFhsqGjpgW5DY/i3mK4M9DTBNz3ErMi8BWYEfI3L0d8GIbGmcdFAS1uIRGjA==}
+    peerDependencies:
+      react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
 
   randombytes@2.1.0:
     resolution: {integrity: sha512-vYl3iOX+4CKUWuxGi9Ukhie6fsqXqS9FE2Zaic4tNFD2N2QQaXOMFbuKK4QmDHC0JO6B1Zp41J0LpT0oR68amQ==}
@@ -8003,6 +8011,10 @@ snapshots:
       - proxy-agent
       - utf-8-validate
       - yauzl
+
+  qrcode.react@4.2.0(react@19.2.8):
+    dependencies:
+      react: 19.2.8
 
   randombytes@2.1.0:
     dependencies:
