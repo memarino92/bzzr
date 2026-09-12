@@ -148,12 +148,12 @@ export function useRoom(code: string) {
     };
   }, [code, you, live, state.generation, handleFailure]);
 
-  async function join(name: string): Promise<void> {
+  async function join(name: string, spectator = false): Promise<void> {
     dispatch({ type: "busy" });
     try {
       const session = await postJson<SessionResponse>(
         "/api/rooms/" + code + "/join",
-        { name },
+        spectator ? { spectator: true } : { name },
       );
       dispatch({ type: "session", session });
     } catch (error) {

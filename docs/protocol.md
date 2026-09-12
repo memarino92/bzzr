@@ -18,6 +18,13 @@ points; invisible formatting/control characters are rejected. Names must be uniq
 case-insensitively in a room. Codes accept lowercase but normalize to six uppercase
 symbols from ABCDEFGHJKLMNPQRSTUVWXYZ23456789.
 
+The join endpoint also accepts `{ "spectator": true }` without a name. Spectators
+have a separate 120-session limit and may join when the 60-player roster is full.
+Their `you` identity is absent from `room.players`; spectator identities are never
+listed in snapshots. Existing cookies reuse their original role. Spectator joins
+do not extend expiry. Spectator sockets reject every game command with
+`UNAUTHORIZED`, but receive snapshots, transport heartbeats, and room-end messages.
+
 Cookies are scoped to /api/rooms/CODE. The body and URL never return the token.
 HTTP errors include 400 invalid input, 401 missing membership, 403 origin/authority,
 404 absent room, 409 name/capacity conflict, 410 expired room, 413 oversized body,
@@ -34,7 +41,7 @@ HTTP errors include 400 invalid input, 401 missing membership, 403 origin/author
 
 Reset/lock/end require the host's authenticated membership. Reset increments the
 round, clears results, and opens buzzing. Round zero waits for the host. Lock
-preserves results. Every client may buzz once per open round, including the host.
+preserves results. Every player may buzz once per open round, including the host.
 Stale rounds are rejected; duplicate buzzes are acknowledged without a write.
 
 Literal text `ping` receives `pong` via Cloudflare's auto-response API. These

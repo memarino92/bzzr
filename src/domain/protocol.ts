@@ -1,6 +1,7 @@
 /** Shared wire contract. This module must stay safe to import in the browser. */
 export const LIMITS = {
   players: 60,
+  spectators: 120,
   nameLength: 24,
   codeLength: 6,
   idleMs: 2 * 60 * 60 * 1000,

@@ -1,6 +1,7 @@
 import { DurableObject } from "cloudflare:workers";
 import {
   addPlayer,
+  addSpectator,
   applyCommand,
   createRoom,
   ensureLive,
@@ -115,7 +116,11 @@ export class BuzzerRoom extends DurableObject {
     try {
       const room = await this.live();
       const tokenHash = request.headers.get("x-bzzr-token-hash");
-      let player = room.players.find((p) => p.tokenHash === tokenHash);
+      const members = (state: RoomState) => [
+        ...state.players,
+        ...(state.spectators ?? []),
+      ];
+      let player = members(room).find((p) => p.tokenHash === tokenHash);
       const path = new URL(request.url).pathname;
       if (path === "/join" && request.method === "POST") {
         if (!tokenHash || !/^[a-f0-9]{64}$/.test(tokenHash))
@@ -124,15 +129,24 @@ export class BuzzerRoom extends DurableObject {
           const body = await readJson(request);
           // Read the latest state after the non-storage await above.
           const current = await this.live();
-          player = current.players.find((p) => p.tokenHash === tokenHash);
+          player = members(current).find((p) => p.tokenHash === tokenHash);
           if (!player) {
-            player = {
+            const member = {
               id: crypto.randomUUID(),
               name: String(body.name ?? ""),
               tokenHash,
               isHost: false,
             };
-            await this.save(addPlayer(current, player, Date.now()));
+            player = member;
+            await this.save(
+              body.spectator === true
+                ? addSpectator(
+                    current,
+                    { id: member.id, tokenHash },
+                    Date.now(),
+                  )
+                : addPlayer(current, member, Date.now()),
+            );
             this.broadcast();
           }
         }

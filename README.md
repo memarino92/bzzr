@@ -33,6 +33,8 @@ tabs in one profile share identity.
 ## What is included
 
 - Named host and players; link sharing and code entry.
+- Large QR invitations in the room menu; nameless spectator entry for projection.
+- Spectators see live results and round status, even with a full player roster.
 - Host opens, resets, locks, and ends the room. The host can buzz too.
 - Server-assigned order, duplicate protection, and stale-round rejection.
 - Cookie-based reconnection, clear offline feedback, and keyboard controls.

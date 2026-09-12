@@ -44,7 +44,8 @@ export function RoomClient({ code }: { code: string }) {
             roomCode={code}
             busy={state.busy}
             error={state.error}
-            onSubmit={state.join}
+            onSubmit={(name) => state.join(name)}
+            onSpectate={() => state.join("", true)}
           />
         </div>
       </AppShell>
