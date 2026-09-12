@@ -22,6 +22,18 @@ export default defineApp([
   route("/health", () => Response.json({ status: "ok" })),
   render(Document, [
     route("/", Home),
+    route("/room/:code/spectate", ({ params, response }) => {
+      try {
+        return <RoomClient code={normalizeCode(params.code)} spectating />;
+      } catch {
+        response.status = 404;
+        return (
+          <AppShell>
+            <RoomNotice kind="not-found" />
+          </AppShell>
+        );
+      }
+    }),
     route("/room/:code", ({ params, response }) => {
       try {
         return <RoomClient code={normalizeCode(params.code)} />;

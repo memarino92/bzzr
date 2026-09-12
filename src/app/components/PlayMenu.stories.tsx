@@ -72,6 +72,16 @@ export const DismissQr: Story = {
   },
 };
 export const Player: Story = { play: open };
+export const SpectatorLink: Story = {
+  play: async (context) => {
+    await open(context);
+    const link = within(context.canvasElement).getByRole("link", {
+      name: "Open spectator view (new tab)",
+    });
+    await expect(link).toHaveAttribute("href", "/room/DEMO23/spectate");
+    await expect(link).toHaveAttribute("target", "_blank");
+  },
+};
 export const Host: Story = { args: { onEnd: fn() }, play: open };
 export const HostOffline: Story = {
   args: { onEnd: fn(), endDisabled: true },

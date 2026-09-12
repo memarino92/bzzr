@@ -19,6 +19,25 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 export const PlayerReady: Story = {};
+export const PlayerSpectatorTab: Story = {
+  args: { spectating: true, room: resultsRoom },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(
+      canvas.getByRole("list", { name: "Buzz order" }),
+    ).toHaveTextContent("Sam");
+    await expect(
+      canvas.queryByRole("button", { name: "Buzz in" }),
+    ).not.toBeInTheDocument();
+    await expect(
+      canvas.queryByRole("region", { name: "Host controls" }),
+    ).not.toBeInTheDocument();
+  },
+};
+export const HostSpectatorTab: Story = {
+  ...PlayerSpectatorTab,
+  args: { ...PlayerSpectatorTab.args, you: "alex" },
+};
 export const HostWaiting: Story = {
   args: { you: "alex", room: { ...sampleRoom, round: 0, status: "waiting" } },
 };

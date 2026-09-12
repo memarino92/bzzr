@@ -80,7 +80,7 @@ function reducer(state: State, action: Action): State {
   }
 }
 
-export function useRoom(code: string) {
+export function useRoom(code: string, spectating = false) {
   const [state, dispatch] = useReducer(reducer, initial);
   const transport = useRef<RoomConnection | null>(null);
   const pendingTimer = useRef<ReturnType<typeof setTimeout> | undefined>(
@@ -110,6 +110,22 @@ export function useRoom(code: string) {
       signal: abort.signal,
     })
       .then(readResponse<SessionResponse>)
+      .catch((error: unknown) => {
+        if (
+          spectating &&
+          error instanceof ApiError &&
+          error.status === 401 &&
+          !abort.signal.aborted
+        )
+          return fetch("/api/rooms/" + code + "/join", {
+            method: "POST",
+            credentials: "same-origin",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ spectator: true }),
+            signal: abort.signal,
+          }).then(readResponse<SessionResponse>);
+        throw error;
+      })
       .then((session) => {
         if (!abort.signal.aborted) dispatch({ type: "session", session });
       })
@@ -117,7 +133,7 @@ export function useRoom(code: string) {
         if (!abort.signal.aborted) handleFailure(error);
       });
     return () => abort.abort();
-  }, [code, state.generation, handleFailure]);
+  }, [code, spectating, state.generation, handleFailure]);
 
   const you = state.session?.you;
   const live = state.phase === "live";
@@ -169,6 +185,7 @@ export function useRoom(code: string) {
   }
 
   function send(command: Command): void {
+    if (spectating) return;
     if (state.pending || state.connection !== "connected") return;
     if (!transport.current?.send(command)) {
       dispatch({

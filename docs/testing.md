@@ -54,6 +54,9 @@ separate spectator cap without extending expiry. Browser journeys cover nameless
 entry, live results/status, refresh, and the full-URL QR modal. Storybook includes
 spectator waiting/open/closed/results/reconnection, full rosters, mobile layouts,
 simulated incoming results, nameless entry validation, and QR dismissal/focus.
+Same-profile browser tests also open spectator tabs for both host and player,
+check live results and refresh, and verify that the original tabs retain play
+and host controls. Hook tests cover direct nameless entry and capacity errors.
 
 Thresholds: at least 80% statements/functions/lines and 75% branches for the
 node/browser-unit scope in vitest.config.ts. The Worker API and DO adapters are

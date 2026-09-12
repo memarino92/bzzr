@@ -6,8 +6,14 @@ import { RoomView } from "./RoomView";
 import { RoomNotice } from "./RoomNotice";
 import { AppShell } from "./AppShell";
 
-export function RoomClient({ code }: { code: string }) {
-  const state = useRoom(code);
+export function RoomClient({
+  code,
+  spectating = false,
+}: {
+  code: string;
+  spectating?: boolean;
+}) {
+  const state = useRoom(code, spectating);
   if (state.phase === "loading")
     return (
       <AppShell>
@@ -45,7 +51,7 @@ export function RoomClient({ code }: { code: string }) {
             busy={state.busy}
             error={state.error}
             onSubmit={(name) => state.join(name)}
-            onSpectate={() => state.join("", true)}
+            onSpectate={() => window.location.assign(`/room/${code}/spectate`)}
           />
         </div>
       </AppShell>
@@ -54,6 +60,7 @@ export function RoomClient({ code }: { code: string }) {
   return (
     <RoomView
       {...state.session}
+      spectating={spectating}
       connection={state.connection}
       pending={state.pending}
       error={state.error}

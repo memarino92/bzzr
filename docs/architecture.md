@@ -49,6 +49,10 @@ roles, rounds, or buzz order. See [ADR 0005](decisions/0005-mobile-play.md).
 
 ## State and consistency
 
+The /room/CODE/spectate route selects presentation per tab, independently of the
+cookie identity. Host/player sessions can therefore project results and continue
+playing simultaneously. See [ADR 0008](decisions/0008-spectator-tabs.md).
+
 Nameless spectators use separate capability records (up to 120), without taking
 one of the 60 player slots. They receive the same public snapshots over hibernating
 sockets and cannot execute game commands or extend expiry. Missing spectator lists

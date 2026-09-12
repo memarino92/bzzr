@@ -5,6 +5,10 @@ must never be cached. Errors are JSON: `{ code, message }`.
 
 ## HTTP
 
+The browser route `/room/:code/spectate` selects a results-only view in that tab.
+It reuses an existing session or automatically joins as a nameless spectator when
+the session endpoint returns 401. It never changes an existing player's role.
+
 | Method / path                | Body              | Response                                        |
 | ---------------------------- | ----------------- | ----------------------------------------------- |
 | POST /api/rooms              | { name }          | 201 { code, you } + host cookie                 |
