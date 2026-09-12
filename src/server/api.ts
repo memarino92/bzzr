@@ -94,10 +94,12 @@ export async function handleApi(
         "Enter your name to join the room.",
         401,
       );
-    const name =
-      action === "join"
-        ? validateName((await readJson(request)).name)
-        : undefined;
+    const body = action === "join" ? await readJson(request) : undefined;
+    const joinBody = body
+      ? body.spectator === true
+        ? { spectator: true }
+        : { name: validateName(body.name) }
+      : undefined;
     token ??= randomToken();
     const headers = new Headers();
     headers.set("x-bzzr-token-hash", await hashToken(token));
@@ -111,11 +113,11 @@ export async function handleApi(
       }
       headers.set("Upgrade", "websocket");
     }
-    if (name) headers.set("Content-Type", "application/json");
+    if (joinBody) headers.set("Content-Type", "application/json");
     const forwarded = new Request(`https://room.internal/${action}`, {
       method: expectedMethod,
       headers,
-      ...(name ? { body: JSON.stringify({ name }) } : {}),
+      ...(joinBody ? { body: JSON.stringify(joinBody) } : {}),
     });
     const response = await env.ROOMS.getByName(code).fetch(forwarded);
     if (action === "socket" || !response.ok) return response;

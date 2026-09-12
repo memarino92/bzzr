@@ -12,6 +12,7 @@ export interface EntryFormProps {
   busy?: boolean;
   error?: string;
   onSubmit: (name: string, code?: string) => Promise<void> | void;
+  onSpectate?: (code: string) => Promise<void> | void;
 }
 
 export function EntryForm({
@@ -20,19 +21,24 @@ export function EntryForm({
   busy = false,
   error,
   onSubmit,
+  onSpectate,
 }: EntryFormProps) {
   const [validation, setValidation] = useState("");
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     try {
-      const name = validateName(data.get("name"));
+      const spectating =
+        (event.nativeEvent as SubmitEvent).submitter?.getAttribute("value") ===
+        "spectator";
+      const name = spectating ? "" : validateName(data.get("name"));
       const code =
         mode === "join"
           ? normalizeCode(roomCode ?? String(data.get("code") ?? ""))
           : undefined;
       setValidation("");
-      await onSubmit(name, code);
+      if (spectating && onSpectate && code) await onSpectate(code);
+      else await onSubmit(name, code);
     } catch (error) {
       setValidation(
         error instanceof Error ? error.message : "Please try again.",
@@ -79,6 +85,17 @@ export function EntryForm({
       <Button type="submit" color="lime" disabled={busy} className="w-full">
         {busy ? "One moment…" : mode === "host" ? "Create a room" : "Join room"}
       </Button>
+      {mode === "join" && onSpectate && (
+        <button
+          type="submit"
+          value="spectator"
+          formNoValidate
+          disabled={busy}
+          className="min-h-11 w-full text-sm text-zinc-600 underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-blue-600 disabled:opacity-50 dark:text-zinc-400"
+        >
+          Join as a spectator
+        </button>
+      )}
     </form>
   );
 }

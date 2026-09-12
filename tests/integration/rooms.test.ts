@@ -89,6 +89,103 @@ afterEach(async () => {
 });
 
 describe("room Worker and Durable Object", () => {
+  it("spectates a full room without a name, restores after eviction, and rejects all game commands", async () => {
+    const host = await create();
+    await Promise.all(
+      Array.from({ length: LIMITS.players - 1 }, (_, i) =>
+        join(host.code, `Guest ${i}`),
+      ),
+    );
+    const response = await api(`/api/rooms/${host.code}/join`, {
+      method: "POST",
+      body: JSON.stringify({ spectator: true }),
+    });
+    expect(response.status).toBe(200);
+    const spectator = (await response.json()) as SessionResponse;
+    const cookie = response.headers.get("Set-Cookie")!.split(";")[0]!;
+    expect(spectator.room.players).toHaveLength(60);
+    expect(spectator.room.players.some((p) => p.id === spectator.you)).toBe(
+      false,
+    );
+    expect(JSON.stringify(spectator)).not.toMatch(/tokenHash|spectators/);
+    const viewer = await connect(host.code, cookie);
+    const owner = await connect(host.code, host.cookie);
+    owner.send({ type: "reset", round: 0 });
+    await viewer.until(
+      (m) => m.type === "snapshot" && m.room.status === "open",
+    );
+    await evictDurableObject(env.ROOMS.getByName(host.code));
+    for (const command of [
+      { type: "buzz", round: 1 },
+      { type: "reset", round: 1 },
+      { type: "lock", round: 1 },
+      { type: "end" },
+    ]) {
+      viewer.messages.length = 0;
+      viewer.send(command);
+      await viewer.until(
+        (m) => m.type === "error" && m.code === "UNAUTHORIZED",
+      );
+    }
+    owner.send({ type: "buzz", round: 1 });
+    await viewer.until(
+      (m) => m.type === "snapshot" && m.room.buzzes.length === 1,
+    );
+    const restored = await api(`/api/rooms/${host.code}/session`, {
+      headers: { Cookie: cookie },
+    });
+    expect(((await restored.json()) as SessionResponse).you).toBe(
+      spectator.you,
+    );
+    owner.send({ type: "end" });
+    await viewer.until((m) => m.type === "ended");
+  });
+  it("bounds spectator identities separately and does not extend room expiry", async () => {
+    const host = await create();
+    const stub = env.ROOMS.getByName(host.code);
+    const before = await runInDurableObject(stub, (_instance, ctx) =>
+      ctx.storage.get<RoomState>("room"),
+    );
+    await runInDurableObject(stub, async (_instance, ctx) => {
+      await ctx.storage.put("room", {
+        ...before!,
+        spectators: Array.from({ length: LIMITS.spectators - 1 }, (_, i) => ({
+          id: `viewer${i}`,
+          tokenHash: `hash${i}`,
+        })),
+      });
+    });
+    await evictDurableObject(stub);
+    const response = await api(`/api/rooms/${host.code}/join`, {
+      method: "POST",
+      body: '{"spectator":true}',
+    });
+    expect(response.status).toBe(200);
+    const cookie = response.headers.get("Set-Cookie")!.split(";")[0]!;
+    expect(
+      (
+        await api(`/api/rooms/${host.code}/join`, {
+          method: "POST",
+          body: '{"spectator":true}',
+          headers: { Cookie: cookie },
+        })
+      ).status,
+    ).toBe(200);
+    expect(
+      (
+        await api(`/api/rooms/${host.code}/join`, {
+          method: "POST",
+          body: '{"spectator":true}',
+        })
+      ).status,
+    ).toBe(409);
+    const after = await runInDurableObject(stub, (_instance, ctx) =>
+      ctx.storage.get<RoomState>("room"),
+    );
+    expect(after!.lastActivityAt).toBe(before!.lastActivityAt);
+    expect(after!.players).toHaveLength(1);
+    expect(after!.spectators).toHaveLength(LIMITS.spectators);
+  });
   it("creates secure host cookies and joins without exposing capabilities", async () => {
     const response = await api("/api/rooms", {
       method: "POST",

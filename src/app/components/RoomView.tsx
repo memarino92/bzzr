@@ -1,5 +1,6 @@
 import type { Command, RoomSnapshot } from "../../domain/protocol";
 import { PlayView } from "./PlayView";
+import { SpectatorView } from "./SpectatorView";
 
 export type Connection = "connecting" | "connected" | "reconnecting" | "failed";
 export interface RoomViewProps {
@@ -21,6 +22,15 @@ export function RoomView({
   onCommand,
   onRetry,
 }: RoomViewProps) {
+  if (!room.players.some((player) => player.id === you))
+    return (
+      <SpectatorView
+        room={room}
+        connection={connection}
+        error={error}
+        onRetry={onRetry}
+      />
+    );
   return (
     <PlayView
       room={room}

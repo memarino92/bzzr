@@ -9,6 +9,7 @@ Keep accepted records stable; add a superseding record when the choice changes.
 4. [Testing and AI workflow](0004-testing-and-ai-workflow.md)
 5. [Mobile play and device preferences](0005-mobile-play.md)
 6. [Storybook owns simulated play](0006-storybook-examples.md)
+7. [Spectators and QR invitations](0007-spectators-and-qr.md)
 
 For a new record, use the next number and include status, date, context, decision,
 consequences, and relevant primary sources. Link it here and from affected docs.

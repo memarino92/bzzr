@@ -21,6 +21,7 @@ export interface RoomState {
   round: number;
   status: RoomSnapshot["status"];
   players: Member[];
+  spectators?: { id: string; tokenHash: string }[];
   buzzes: Buzz[];
 }
 
@@ -83,6 +84,23 @@ export function addPlayer(
     lastActivityAt: now,
     players: [...room.players, { ...player, name, isHost: false }],
   };
+}
+
+export function addSpectator(
+  room: RoomState,
+  spectator: { id: string; tokenHash: string },
+  now: number,
+): RoomState {
+  ensureLive(room, now);
+  const spectators = room.spectators ?? [];
+  if (spectators.length >= LIMITS.spectators)
+    throw new RoomError(
+      "SPECTATORS_FULL",
+      "This room has reached its spectator limit.",
+      409,
+    );
+  // Watching never extends game activity or consumes a player slot.
+  return { ...room, spectators: [...spectators, spectator] };
 }
 
 /** Arrival order is the order in which the room's single authority calls this. */

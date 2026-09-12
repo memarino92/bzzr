@@ -5,7 +5,7 @@ import { EntryForm } from "./EntryForm";
 const meta = {
   title: "Game/Entry form",
   component: EntryForm,
-  args: { mode: "host", onSubmit: fn() },
+  args: { mode: "host", onSubmit: fn(), onSpectate: fn() },
   decorators: [
     (Story) => (
       <div className="mx-auto max-w-md p-4">
@@ -37,4 +37,31 @@ export const NameTaken: Story = {
 };
 export const RoomFull: Story = {
   args: { mode: "join", error: "This room has reached its 60-player limit." },
+};
+export const SpectateWithoutName: Story = {
+  args: { mode: "join", roomCode: "ABC234" },
+  play: async ({ canvasElement, args }) => {
+    await userEvent.click(
+      within(canvasElement).getByRole("button", {
+        name: "Join as a spectator",
+      }),
+    );
+    await expect(args.onSpectate).toHaveBeenCalledWith("ABC234");
+    await expect(args.onSubmit).not.toHaveBeenCalled();
+  },
+};
+export const SpectateByCode: Story = {
+  args: { mode: "join" },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement);
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Join as a spectator" }),
+    );
+    await expect(canvas.getByRole("alert")).toHaveTextContent("six-character");
+    await userEvent.type(canvas.getByLabelText("Room code"), "abc234");
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Join as a spectator" }),
+    );
+    await expect(args.onSpectate).toHaveBeenCalledWith("ABC234");
+  },
 };

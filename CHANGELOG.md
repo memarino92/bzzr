@@ -4,6 +4,9 @@ Changes follow Conventional Commits. This log records user-visible milestones.
 
 ## 1.0.0 — Unreleased
 
+- Add a large QR invitation modal to the room menu.
+- Add nameless spectator entry and a projection-friendly live results view, with separate capacity from players.
+
 - Promote the phone-first play prototype to live host and player rooms.
 - Add a 90s-inspired visual style, a participant drawer, and a host-only end action in the room menu.
 - Remember handedness and explicit light/dark choices on the device, defaulting appearance to the system.

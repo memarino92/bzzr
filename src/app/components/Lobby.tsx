@@ -8,7 +8,7 @@ export function Lobby() {
   const [mode, setMode] = useState<"host" | "join">("host");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
-  async function submit(name: string, code?: string) {
+  async function submit(name: string, code?: string, spectator = false) {
     setBusy(true);
     setError("");
     try {
@@ -16,7 +16,10 @@ export function Lobby() {
         const result = await postJson<{ code: string }>("/api/rooms", { name });
         window.location.assign("/room/" + result.code);
       } else {
-        await postJson("/api/rooms/" + code + "/join", { name });
+        await postJson(
+          "/api/rooms/" + code + "/join",
+          spectator ? { spectator: true } : { name },
+        );
         window.location.assign("/room/" + code);
       }
     } catch (error) {
@@ -66,6 +69,7 @@ export function Lobby() {
         busy={busy}
         error={error}
         onSubmit={submit}
+        onSpectate={(code) => submit("", code, true)}
       />
       <p className="mt-6 text-center text-xs text-zinc-500 dark:text-zinc-400">
         No account. No download. Up to 60 people.

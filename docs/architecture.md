@@ -49,6 +49,11 @@ roles, rounds, or buzz order. See [ADR 0005](decisions/0005-mobile-play.md).
 
 ## State and consistency
 
+Nameless spectators use separate capability records (up to 120), without taking
+one of the 60 player slots. They receive the same public snapshots over hibernating
+sockets and cannot execute game commands or extend expiry. Missing spectator lists
+in existing schema-v1 records default to empty. See [ADR 0007](decisions/0007-spectators-and-qr.md).
+
 The versioned record has names, roles, token hashes, timestamps, current round,
 status, and at most one buzz per participant. It is a bounded SQLite-backed KV
 record, not a growing event log. No external I/O participates in a state transition.

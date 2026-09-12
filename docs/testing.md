@@ -48,6 +48,13 @@ automation, not a substitute for screen-reader and touch-device review.
 
 ## Coverage and artifacts
 
+Spectator integration cases fill all 60 player slots, join without a name, restore
+sockets after real eviction, reject buzz/reset/lock/end commands, and verify the
+separate spectator cap without extending expiry. Browser journeys cover nameless
+entry, live results/status, refresh, and the full-URL QR modal. Storybook includes
+spectator waiting/open/closed/results/reconnection, full rosters, mobile layouts,
+simulated incoming results, nameless entry validation, and QR dismissal/focus.
+
 Thresholds: at least 80% statements/functions/lines and 75% branches for the
 node/browser-unit scope in vitest.config.ts. The Worker API and DO adapters are
 tested in workerd, outside that V8 percentage. The copied Catalyst vendor files,
