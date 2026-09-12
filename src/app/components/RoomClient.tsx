@@ -14,6 +14,12 @@ export function RoomClient({
   spectating?: boolean;
 }) {
   const state = useRoom(code, spectating);
+  if (state.phase === "removed" || state.phase === "banned")
+    return (
+      <AppShell>
+        <RoomNotice kind={state.phase} roomCode={code} />
+      </AppShell>
+    );
   if (state.phase === "left")
     return (
       <AppShell>

@@ -143,6 +143,19 @@ function PlayExample({
           onHostCommand={
             host
               ? (command) => {
+                  if (command.type === "remove" || command.type === "ban")
+                    setRoom({
+                      ...room,
+                      players: room.players.filter(
+                        (player) => player.id !== command.playerId,
+                      ),
+                      buzzes: room.buzzes
+                        .filter((buzz) => buzz.playerId !== command.playerId)
+                        .map((buzz, index) => ({
+                          ...buzz,
+                          position: index + 1,
+                        })),
+                    });
                   if (command.type === "end") {
                     setEnded(true);
                     setRoom({ ...room, players: [], buzzes: [] });

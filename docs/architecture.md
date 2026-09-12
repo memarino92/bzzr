@@ -49,6 +49,11 @@ roles, rounds, or buzz order. See [ADR 0005](decisions/0005-mobile-play.md).
 
 ## State and consistency
 
+Host removal frees another player's seat and buzz; a ban additionally rejects their
+browser capability for the remaining room lifetime. All target sockets close after
+persistence. Bans are private, bounded, and have no undo operation; fresh browser
+identities can bypass them. See [ADR 0010](decisions/0010-host-moderation.md).
+
 Explicit departure removes the authenticated membership and current buzz before
 notifying its sockets and broadcasting the remaining roster. Hosting transfers
 in join order; the last player's departure closes the room. Disconnects still

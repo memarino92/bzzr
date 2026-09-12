@@ -22,6 +22,7 @@ export interface RoomState {
   status: RoomSnapshot["status"];
   players: Member[];
   spectators?: { id: string; tokenHash: string }[];
+  bannedTokenHashes?: string[];
   buzzes: Buzz[];
 }
 
@@ -60,6 +61,7 @@ export function addPlayer(
   now: number,
 ): RoomState {
   ensureLive(room, now);
+  ensureNotBanned(room, player.tokenHash);
   if (room.players.length >= LIMITS.players)
     throw new RoomError(
       "ROOM_FULL",
@@ -92,6 +94,7 @@ export function addSpectator(
   now: number,
 ): RoomState {
   ensureLive(room, now);
+  ensureNotBanned(room, spectator.tokenHash);
   const spectators = room.spectators ?? [];
   if (spectators.length >= LIMITS.spectators)
     throw new RoomError(
@@ -101,6 +104,18 @@ export function addSpectator(
     );
   // Watching never extends game activity or consumes a player slot.
   return { ...room, spectators: [...spectators, spectator] };
+}
+
+export function ensureNotBanned(
+  room: RoomState,
+  tokenHash: string | null,
+): void {
+  if (tokenHash && room.bannedTokenHashes?.includes(tokenHash))
+    throw new RoomError(
+      "BANNED",
+      "You have been banned from this room. This cannot be undone.",
+      403,
+    );
 }
 
 /** Explicit departure frees membership; disconnecting alone does not. */
@@ -145,6 +160,30 @@ export function applyCommand(
     throw new RoomError("HOST_ONLY", "Only the host can do that.", 403);
   }
   if (command.type === "end") return null;
+  if (command.type === "remove" || command.type === "ban") {
+    const target = room.players.find((p) => p.id === command.playerId);
+    if (!target)
+      throw new RoomError(
+        "PLAYER_NOT_FOUND",
+        "That player has already left the room.",
+        409,
+      );
+    if (target.isHost)
+      throw new RoomError("INVALID_TARGET", "The host cannot be removed.");
+    const bans = room.bannedTokenHashes ?? [];
+    if (command.type === "ban" && bans.length >= LIMITS.bans)
+      throw new RoomError(
+        "BAN_LIMIT",
+        "This room has reached its ban limit. You can still remove players.",
+        409,
+      );
+    return {
+      ...leaveRoom(room, target.id, now)!,
+      lastActivityAt: now,
+      bannedTokenHashes:
+        command.type === "ban" ? [...bans, target.tokenHash] : bans,
+    };
+  }
   // Compare-and-set makes duplicate reset clicks safe and rejects delayed buzzes.
   if (command.round !== room.round)
     throw new RoomError("STALE_ROUND", "The round changed. Try again.");

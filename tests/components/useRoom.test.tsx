@@ -39,6 +39,25 @@ afterEach(() => {
 });
 
 describe("room hook lifecycle", () => {
+  it.each([false, true])(
+    "stops transport on removal (banned=%s)",
+    async (banned) => {
+      const { result } = renderHook(() => useRoom("ABC234"));
+      await waitFor(() => expect(result.current.phase).toBe("live"));
+      act(() => mocks.callbacks?.message({ type: "removed", banned }));
+      expect(result.current.phase).toBe(banned ? "banned" : "removed");
+      expect(mocks.stop).toHaveBeenCalled();
+      expect(result.current.pending).toBe(false);
+    },
+  );
+  it("does not autojoin a banned spectator identity", async () => {
+    vi.mocked(fetch).mockResolvedValueOnce(
+      Response.json({ code: "BANNED", message: "Banned" }, { status: 403 }),
+    );
+    const { result } = renderHook(() => useRoom("ABC234", true));
+    await waitFor(() => expect(result.current.phase).toBe("banned"));
+    expect(fetch).toHaveBeenCalledTimes(1);
+  });
   it("leaves only after server acknowledgement and stops the transport", async () => {
     const { result } = renderHook(() => useRoom("ABC234"));
     await waitFor(() => expect(result.current.phase).toBe("live"));

@@ -100,6 +100,13 @@ export class RoomConnection {
     socket.onclose = (event) => {
       if (this.stopped || this.socket !== socket) return;
       this.clearHealth();
+      if (event.code === 4006 || event.code === 4007) {
+        this.callbacks.message({
+          type: "removed",
+          banned: event.code === 4007,
+        });
+        return;
+      }
       if (event.code === 4005) {
         this.callbacks.message({ type: "left" });
         return;
@@ -131,7 +138,10 @@ export class RoomConnection {
       );
     } catch (error) {
       if (this.stopped || this.socket !== closedSocket) return;
-      if (error instanceof ApiError && [401, 404, 410].includes(error.status)) {
+      if (
+        error instanceof ApiError &&
+        [401, 403, 404, 410].includes(error.status)
+      ) {
         this.callbacks.sessionLost(error);
         return;
       }

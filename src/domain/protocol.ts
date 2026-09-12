@@ -2,6 +2,7 @@
 export const LIMITS = {
   players: 60,
   spectators: 120,
+  bans: 600,
   nameLength: 24,
   codeLength: 6,
   idleMs: 2 * 60 * 60 * 1000,
@@ -36,12 +37,15 @@ export interface RoomSnapshot {
 }
 
 export type Command =
+  | { type: "remove"; playerId: string }
+  | { type: "ban"; playerId: string }
   | { type: "buzz"; round: number }
   | { type: "reset"; round: number }
   | { type: "lock"; round: number }
   | { type: "end" };
 
 export type ServerMessage =
+  | { type: "removed"; banned: boolean }
   | { type: "left" }
   | { type: "snapshot"; room: RoomSnapshot; you: string }
   | { type: "error"; code: string; message: string }
@@ -97,6 +101,13 @@ export function parseCommand(input: unknown): Command {
     throw new RoomError("INVALID_COMMAND", "That command could not be read.");
   }
   const command = input as Record<string, unknown>;
+  if (
+    (command.type === "remove" || command.type === "ban") &&
+    typeof command.playerId === "string" &&
+    command.playerId.length > 0 &&
+    command.playerId.length <= 64
+  )
+    return { type: command.type, playerId: command.playerId };
   if (command.type === "end") return { type: "end" };
   if (
     (command.type === "buzz" ||

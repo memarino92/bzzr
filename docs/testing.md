@@ -48,6 +48,12 @@ automation, not a substitute for screen-reader and touch-device review.
 
 ## Coverage and artifacts
 
+Moderation tests cover host-only authority, self-removal rejection, stale targets,
+bounded private ban storage, eviction persistence, all-tab revocation, and
+player/spectator reentry. Browser journeys exercise removal, rejoining, ban
+confirmation/cancel, and ban enforcement after reload. Storybook covers both
+confirmations, cancellation, disabled controls, player mode, and removal/ban notices.
+
 Explicit departure tests cover seat/name reuse at capacity, revocation of all
 shared sockets after eviction, host handoff, final-player cleanup, spectator
 departure, and origin protection. Browser tests exercise confirmation/cancel,

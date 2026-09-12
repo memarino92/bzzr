@@ -7,7 +7,15 @@ import { ApiError, postJson, readResponse } from "../lib/api-client";
 import { RoomConnection } from "../lib/room-connection";
 
 interface State {
-  phase: "loading" | "join" | "live" | "ended" | "error" | "left";
+  phase:
+    | "loading"
+    | "join"
+    | "live"
+    | "ended"
+    | "error"
+    | "left"
+    | "removed"
+    | "banned";
   session?: SessionResponse;
   connection: Connection;
   error: string;
@@ -98,7 +106,9 @@ export function useRoom(code: string, spectating = false) {
   );
 
   const handleFailure = useCallback((error: unknown) => {
-    if (error instanceof ApiError && error.status === 401)
+    if (error instanceof ApiError && error.code === "BANNED")
+      dispatch({ type: "failure", phase: "banned", error: error.message });
+    else if (error instanceof ApiError && error.status === 401)
       dispatch({ type: "join" });
     else if (error instanceof ApiError && [404, 410].includes(error.status))
       dispatch({ type: "ended", reason: "expired" });
@@ -154,6 +164,15 @@ export function useRoom(code: string, spectating = false) {
       sessionLost: handleFailure,
       message: (message) => {
         clearTimeout(pendingTimer.current);
+        if (message.type === "removed") {
+          transport.current?.stop();
+          dispatch({
+            type: "failure",
+            phase: message.banned ? "banned" : "removed",
+            error: "",
+          });
+          return;
+        }
         if (message.type === "left") {
           transport.current?.stop();
           dispatch({ type: "left" });
@@ -188,7 +207,10 @@ export function useRoom(code: string, spectating = false) {
       );
       dispatch({ type: "session", session });
     } catch (error) {
-      if (error instanceof ApiError && [404, 410].includes(error.status))
+      if (
+        error instanceof ApiError &&
+        (error.code === "BANNED" || [404, 410].includes(error.status))
+      )
         handleFailure(error);
       else
         dispatch({

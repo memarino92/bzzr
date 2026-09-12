@@ -12,6 +12,7 @@ Keep accepted records stable; add a superseding record when the choice changes.
 7. [Spectators and QR invitations](0007-spectators-and-qr.md)
 8. [Spectator views belong to tabs](0008-spectator-tabs.md)
 9. [Explicit room departure](0009-explicit-departure.md)
+10. [Host removal and room bans](0010-host-moderation.md)
 
 For a new record, use the next number and include status, date, context, decision,
 consequences, and relevant primary sources. Link it here and from affected docs.

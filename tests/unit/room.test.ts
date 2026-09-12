@@ -32,6 +32,63 @@ const open = () =>
   applyCommand(setup(), "host", { type: "reset", round: 0 }, 102)!;
 
 describe("room rules", () => {
+  it("limits moderation to the host and rejects self-removal and stale targets", () => {
+    expect(() =>
+      applyCommand(setup(), "guest", { type: "ban", playerId: "host" }, 103),
+    ).toThrow("Only the host");
+    expect(() =>
+      applyCommand(setup(), "host", { type: "remove", playerId: "host" }, 103),
+    ).toThrow("host cannot be removed");
+    expect(() =>
+      applyCommand(setup(), "host", { type: "ban", playerId: "gone" }, 103),
+    ).toThrow("already left");
+  });
+  it("removes the buzz and permits rejoining, but keeps bans private and irreversible", () => {
+    const buzzing = applyCommand(
+      open(),
+      "guest",
+      { type: "buzz", round: 1 },
+      103,
+    )!;
+    const removed = applyCommand(
+      buzzing,
+      "host",
+      { type: "remove", playerId: "guest" },
+      104,
+    )!;
+    expect(removed.buzzes).toEqual([]);
+    expect(addPlayer(removed, guest, 105).players).toHaveLength(2);
+    const banned = applyCommand(
+      buzzing,
+      "host",
+      { type: "ban", playerId: "guest" },
+      104,
+    )!;
+    expect(() =>
+      addPlayer(banned, { ...guest, name: "New name" }, 105),
+    ).toThrow("banned");
+    expect(JSON.stringify(snapshot(banned, new Set()))).not.toContain(
+      guest.tokenHash,
+    );
+    expect(banned.bannedTokenHashes).toEqual([guest.tokenHash]);
+  });
+  it("bounds ban storage and moderation command inputs", () => {
+    const full = {
+      ...setup(),
+      bannedTokenHashes: Array.from({ length: LIMITS.bans }, (_, i) =>
+        String(i),
+      ),
+    };
+    expect(() =>
+      applyCommand(full, "host", { type: "ban", playerId: "guest" }, 103),
+    ).toThrow("ban limit");
+    expect(
+      applyCommand(full, "host", { type: "remove", playerId: "guest" }, 103)!
+        .players,
+    ).toHaveLength(1);
+    for (const playerId of ["", "a".repeat(65), 12, null])
+      expect(() => parseCommand({ type: "ban", playerId })).toThrow();
+  });
   it("removes a departing buzz and reassigns remaining positions without changing round or expiry", () => {
     const first = applyCommand(
       open(),

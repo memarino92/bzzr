@@ -89,6 +89,66 @@ afterEach(async () => {
 });
 
 describe("room Worker and Durable Object", () => {
+  it.each(["remove", "ban"] as const)(
+    "persists %s after eviction, revokes all tabs, and enforces reentry",
+    async (type) => {
+      const host = await create();
+      const guest = await join(host.code);
+      const first = await connect(host.code, guest.cookie);
+      const second = await connect(host.code, guest.cookie);
+      const owner = await connect(host.code, host.cookie);
+      first.send({ type, playerId: host.you });
+      await first.until((m) => m.type === "error" && m.code === "HOST_ONLY");
+      owner.send({ type: "reset", round: 0 });
+      await first.until((m) => m.type === "snapshot" && m.room.round === 1);
+      first.send({ type: "buzz", round: 1 });
+      await owner.until(
+        (m) => m.type === "snapshot" && m.room.buzzes.length === 1,
+      );
+      await evictDurableObject(env.ROOMS.getByName(host.code));
+      owner.send({ type, playerId: guest.you });
+      await first.until(
+        (m) => m.type === "removed" && m.banned === (type === "ban"),
+      );
+      await second.until((m) => m.type === "removed");
+      await owner.until(
+        (m) =>
+          m.type === "snapshot" &&
+          m.room.players.length === 1 &&
+          m.room.buzzes.length === 0,
+      );
+      await evictDurableObject(env.ROOMS.getByName(host.code));
+      for (const action of ["session", "socket", "leave"]) {
+        const response = await api(`/api/rooms/${host.code}/${action}`, {
+          method: action === "leave" ? "POST" : "GET",
+          headers: {
+            Cookie: guest.cookie,
+            ...(action === "socket" ? { Upgrade: "websocket" } : {}),
+          },
+          ...(action === "leave" ? { body: "{}" } : {}),
+        });
+        expect(response.status).toBe(
+          type === "ban" ? 403 : action === "leave" ? 200 : 401,
+        );
+        if (type === "ban")
+          expect(response.headers.get("Set-Cookie")).toBeNull();
+      }
+      const rejoin = await api(`/api/rooms/${host.code}/join`, {
+        method: "POST",
+        headers: { Cookie: guest.cookie },
+        body: JSON.stringify({ name: "New name" }),
+      });
+      expect(rejoin.status).toBe(type === "ban" ? 403 : 200);
+      if (type === "ban") {
+        const watch = await api(`/api/rooms/${host.code}/join`, {
+          method: "POST",
+          headers: { Cookie: guest.cookie },
+          body: JSON.stringify({ spectator: true }),
+        });
+        expect(watch.status).toBe(403);
+      }
+    },
+  );
   it("frees a full room seat, revokes all departing sockets, and reuses the name after eviction", async () => {
     const host = await create();
     const guest = await join(host.code, "Sam");
@@ -250,6 +310,8 @@ describe("room Worker and Durable Object", () => {
       { type: "reset", round: 1 },
       { type: "lock", round: 1 },
       { type: "end" },
+      { type: "remove", playerId: host.you },
+      { type: "ban", playerId: host.you },
     ]) {
       viewer.messages.length = 0;
       viewer.send(command);
