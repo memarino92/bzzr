@@ -5,6 +5,7 @@ import {
   createRoom,
   ensureLive,
   expiresAt,
+  leaveRoom,
   snapshot,
 } from "../../src/domain/room";
 import {
@@ -31,6 +32,27 @@ const open = () =>
   applyCommand(setup(), "host", { type: "reset", round: 0 }, 102)!;
 
 describe("room rules", () => {
+  it("removes a departing buzz and reassigns remaining positions without changing round or expiry", () => {
+    const first = applyCommand(
+      open(),
+      "guest",
+      { type: "buzz", round: 1 },
+      103,
+    )!;
+    const second = applyCommand(
+      first,
+      "host",
+      { type: "buzz", round: 1 },
+      104,
+    )!;
+    const after = leaveRoom(second, "guest", 105)!;
+    expect(after.buzzes).toEqual([{ playerId: "host", position: 1 }]);
+    expect(after.round).toBe(1);
+    expect(after.status).toBe("open");
+    expect(expiresAt(after)).toBe(expiresAt(second));
+    expect(second.players).toHaveLength(2);
+    expect(second.buzzes).toHaveLength(2);
+  });
   it("starts locked until the host opens the first round", () => {
     const room = setup();
     expect(room.status).toBe("waiting");

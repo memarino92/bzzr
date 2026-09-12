@@ -49,6 +49,11 @@ roles, rounds, or buzz order. See [ADR 0005](decisions/0005-mobile-play.md).
 
 ## State and consistency
 
+Explicit departure removes the authenticated membership and current buzz before
+notifying its sockets and broadcasting the remaining roster. Hosting transfers
+in join order; the last player's departure closes the room. Disconnects still
+preserve membership. See [ADR 0009](decisions/0009-explicit-departure.md).
+
 The /room/CODE/spectate route selects presentation per tab, independently of the
 cookie identity. Host/player sessions can therefore project results and continue
 playing simultaneously. See [ADR 0008](decisions/0008-spectator-tabs.md).

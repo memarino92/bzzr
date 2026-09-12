@@ -42,6 +42,7 @@ export type Command =
   | { type: "end" };
 
 export type ServerMessage =
+  | { type: "left" }
   | { type: "snapshot"; room: RoomSnapshot; you: string }
   | { type: "error"; code: string; message: string }
   | { type: "ended"; reason: "closed" | "expired" };

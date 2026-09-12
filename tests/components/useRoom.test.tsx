@@ -39,6 +39,35 @@ afterEach(() => {
 });
 
 describe("room hook lifecycle", () => {
+  it("leaves only after server acknowledgement and stops the transport", async () => {
+    const { result } = renderHook(() => useRoom("ABC234"));
+    await waitFor(() => expect(result.current.phase).toBe("live"));
+    vi.mocked(fetch).mockResolvedValueOnce(Response.json({ ok: true }));
+    await act(() => result.current.leave());
+    expect(fetch).toHaveBeenLastCalledWith(
+      "/api/rooms/ABC234/leave",
+      expect.objectContaining({ method: "POST", body: "{}" }),
+    );
+    expect(result.current.phase).toBe("left");
+    expect(result.current.session).toBeUndefined();
+    expect(mocks.stop).toHaveBeenCalled();
+  });
+  it("keeps the seat view and reports an error when leaving fails", async () => {
+    const { result } = renderHook(() => useRoom("ABC234"));
+    await waitFor(() => expect(result.current.phase).toBe("live"));
+    vi.mocked(fetch).mockRejectedValueOnce(new Error("Offline"));
+    await act(() => result.current.leave());
+    expect(result.current.phase).toBe("live");
+    expect(result.current.error).toBe("Offline");
+    expect(result.current.busy).toBe(false);
+  });
+  it("ends a spectator tab when the shared identity leaves elsewhere", async () => {
+    const { result } = renderHook(() => useRoom("ABC234", true));
+    await waitFor(() => expect(result.current.phase).toBe("live"));
+    act(() => mocks.callbacks?.message({ type: "left" }));
+    expect(result.current.phase).toBe("left");
+    expect(mocks.stop).toHaveBeenCalled();
+  });
   it("reuses a player's session for a spectator tab without sending commands", async () => {
     const { result } = renderHook(() => useRoom("ABC234", true));
     await waitFor(() => expect(result.current.phase).toBe("live"));

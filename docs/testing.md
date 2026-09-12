@@ -48,6 +48,11 @@ automation, not a substitute for screen-reader and touch-device review.
 
 ## Coverage and artifacts
 
+Explicit departure tests cover seat/name reuse at capacity, revocation of all
+shared sockets after eviction, host handoff, final-player cleanup, spectator
+departure, and origin protection. Browser tests exercise confirmation/cancel,
+shared spectator-tab departure, and rejoining without reclaiming the host role.
+
 Spectator integration cases fill all 60 player slots, join without a name, restore
 sockets after real eviction, reject buzz/reset/lock/end commands, and verify the
 separate spectator cap without extending expiry. Browser journeys cover nameless

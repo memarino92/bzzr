@@ -4,12 +4,15 @@ export function RoomNotice({
   kind,
   message,
   onRetry,
+  roomCode,
 }: {
-  kind: "loading" | "closed" | "expired" | "error" | "not-found";
+  kind: "loading" | "closed" | "expired" | "error" | "not-found" | "left";
+  roomCode?: string;
   message?: string;
   onRetry?: () => void;
 }) {
   const title = {
+    left: "You left the room.",
     loading: "Finding your room…",
     closed: "That’s a wrap.",
     expired: "This room has finished.",
@@ -19,6 +22,7 @@ export function RoomNotice({
   const detail =
     message ??
     {
+      left: "Your spot is free for someone else.",
       loading: "Getting your buzzer ready.",
       closed: "The host ended the room. Thanks for playing.",
       expired:
@@ -40,6 +44,11 @@ export function RoomNotice({
       </p>
       {kind !== "loading" && (
         <div className="mt-8 flex justify-center gap-3">
+          {kind === "left" && roomCode && (
+            <Button href={`/room/${roomCode}`} color="lime">
+              Join again
+            </Button>
+          )}
           {onRetry && (
             <Button color="lime" onClick={onRetry}>
               Retry connection

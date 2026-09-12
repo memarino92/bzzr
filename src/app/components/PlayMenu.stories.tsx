@@ -35,6 +35,7 @@ const open: Story["play"] = async ({ canvasElement }) => {
   );
 };
 export const Closed: Story = {};
+export const LeaveAvailable: Story = { args: { onLeave: fn() }, play: open };
 export const QrCode: Story = {
   play: async (context) => {
     await open(context);

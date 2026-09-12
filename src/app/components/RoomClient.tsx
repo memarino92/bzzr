@@ -14,6 +14,12 @@ export function RoomClient({
   spectating?: boolean;
 }) {
   const state = useRoom(code, spectating);
+  if (state.phase === "left")
+    return (
+      <AppShell>
+        <RoomNotice kind="left" roomCode={code} />
+      </AppShell>
+    );
   if (state.phase === "loading")
     return (
       <AppShell>
@@ -66,6 +72,8 @@ export function RoomClient({
       error={state.error}
       onCommand={state.send}
       onRetry={state.retry}
+      onLeave={state.leave}
+      leaving={state.busy}
     />
   );
 }

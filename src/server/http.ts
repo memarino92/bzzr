@@ -93,9 +93,10 @@ export function sessionCookie(
   request: Request,
   code: string,
   token: string,
+  maxAge = 86400,
 ): string {
   const secure = new URL(request.url).protocol === "https:" ? "; Secure" : "";
-  return `bzzr_${code}=${token}; Path=/api/rooms/${code}; HttpOnly; SameSite=Strict; Max-Age=86400${secure}`;
+  return `bzzr_${code}=${token}; Path=/api/rooms/${code}; HttpOnly; SameSite=Strict; Max-Age=${maxAge}${secure}`;
 }
 
 export function randomToken(): string {

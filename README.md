@@ -36,6 +36,7 @@ tabs in one profile share identity.
 - Large QR invitations in the room menu; nameless spectator entry for projection.
 - Spectators see live results and round status, even with a full player roster.
 - Any player can open a spectator view in a second tab while continuing to play.
+- Leave room explicitly to free your seat and name; departing hosts pass hosting to the next player.
 - Host opens, resets, locks, and ends the room. The host can buzz too.
 - Server-assigned order, duplicate protection, and stale-round rejection.
 - Cookie-based reconnection, clear offline feedback, and keyboard controls.
