@@ -6,6 +6,7 @@ export type Connection = "connecting" | "connected" | "reconnecting" | "failed";
 export interface RoomViewProps {
   room: RoomSnapshot;
   you: string;
+  spectating?: boolean;
   connection: Connection;
   pending?: boolean;
   error?: string;
@@ -16,13 +17,14 @@ export interface RoomViewProps {
 export function RoomView({
   room,
   you,
+  spectating = false,
   connection,
   pending,
   error,
   onCommand,
   onRetry,
 }: RoomViewProps) {
-  if (!room.players.some((player) => player.id === you))
+  if (spectating || !room.players.some((player) => player.id === you))
     return (
       <SpectatorView
         room={room}

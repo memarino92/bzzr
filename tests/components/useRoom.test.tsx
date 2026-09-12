@@ -39,6 +39,42 @@ afterEach(() => {
 });
 
 describe("room hook lifecycle", () => {
+  it("reuses a player's session for a spectator tab without sending commands", async () => {
+    const { result } = renderHook(() => useRoom("ABC234", true));
+    await waitFor(() => expect(result.current.phase).toBe("live"));
+    expect(fetch).toHaveBeenCalledTimes(1);
+    expect(result.current.session?.you).toBe("sam");
+    act(() => mocks.callbacks?.status("connected"));
+    act(() => result.current.send({ type: "buzz", round: 1 }));
+    expect(mocks.send).not.toHaveBeenCalled();
+  });
+  it("automatically joins a direct spectator link without a name", async () => {
+    vi.mocked(fetch).mockResolvedValueOnce(
+      Response.json({ code: "UNAUTHORIZED" }, { status: 401 }),
+    );
+    const { result } = renderHook(() => useRoom("ABC234", true));
+    await waitFor(() => expect(result.current.phase).toBe("live"));
+    expect(fetch).toHaveBeenLastCalledWith(
+      "/api/rooms/ABC234/join",
+      expect.objectContaining({ method: "POST", body: '{"spectator":true}' }),
+    );
+  });
+  it("shows spectator capacity errors rather than retrying joins indefinitely", async () => {
+    vi.mocked(fetch)
+      .mockResolvedValueOnce(
+        Response.json({ code: "UNAUTHORIZED" }, { status: 401 }),
+      )
+      .mockResolvedValueOnce(
+        Response.json(
+          { code: "SPECTATORS_FULL", message: "Spectator limit reached." },
+          { status: 409 },
+        ),
+      );
+    const { result } = renderHook(() => useRoom("ABC234", true));
+    await waitFor(() => expect(result.current.phase).toBe("error"));
+    expect(result.current.error).toBe("Spectator limit reached.");
+    expect(fetch).toHaveBeenCalledTimes(2);
+  });
   it("loads a session, subscribes, receives updates, and cleans up", async () => {
     const { result, unmount } = renderHook(() => useRoom("ABC234"));
     expect(result.current.phase).toBe("loading");

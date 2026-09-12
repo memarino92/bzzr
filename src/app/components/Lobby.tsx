@@ -16,10 +16,11 @@ export function Lobby() {
         const result = await postJson<{ code: string }>("/api/rooms", { name });
         window.location.assign("/room/" + result.code);
       } else {
-        await postJson(
-          "/api/rooms/" + code + "/join",
-          spectator ? { spectator: true } : { name },
-        );
+        if (spectator) {
+          window.location.assign("/room/" + code + "/spectate");
+          return;
+        }
+        await postJson("/api/rooms/" + code + "/join", { name });
         window.location.assign("/room/" + code);
       }
     } catch (error) {

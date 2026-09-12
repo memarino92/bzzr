@@ -106,6 +106,14 @@ export function PlayMenu({
                 Open QR code
               </button>
               <HandednessSwitch leftHanded={leftHanded} onToggle={onToggle} />
+              <a
+                href={`/room/${code}/spectate`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex min-h-12 w-full items-center px-2 text-sm font-bold hover:bg-zinc-100 focus-visible:outline-2 focus-visible:outline-blue-600 dark:hover:bg-zinc-800"
+              >
+                Open spectator view<span className="sr-only"> (new tab)</span>
+              </a>
               {onEnd && (
                 <button
                   type="button"

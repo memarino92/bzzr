@@ -4,6 +4,8 @@ Changes follow Conventional Commits. This log records user-visible milestones.
 
 ## 1.0.0 — Unreleased
 
+- Let hosts and players open a spectator tab without changing their playing session.
+
 - Add a large QR invitation modal to the room menu.
 - Add nameless spectator entry and a projection-friendly live results view, with separate capacity from players.
 
