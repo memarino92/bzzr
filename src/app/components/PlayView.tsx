@@ -226,7 +226,12 @@ export function PlayView({
             onCommand={onHostCommand}
           />
         )}
-        <ParticipantDrawer players={room.players} you={you} />
+        <ParticipantDrawer
+          players={room.players}
+          you={you}
+          onModerate={isHost ? onHostCommand : undefined}
+          disabled={!connected || pending}
+        />
       </main>
     </div>
   );

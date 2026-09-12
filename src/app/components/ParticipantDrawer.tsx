@@ -7,16 +7,41 @@ import {
   DialogPanel,
   DialogTitle,
 } from "@headlessui/react";
-import type { RoomSnapshot } from "../../domain/protocol";
+import type { Command, RoomSnapshot } from "../../domain/protocol";
+import {
+  Alert,
+  AlertTitle,
+  AlertDescription,
+  AlertActions,
+} from "./catalyst/alert";
+import { Button } from "./catalyst/button";
 
 export function ParticipantDrawer({
   players,
   you,
+  onModerate,
+  disabled = false,
 }: {
   players: RoomSnapshot["players"];
   you: string;
+  onModerate?: (command: Command) => void;
+  disabled?: boolean;
 }) {
   const [open, setOpen] = useState(false);
+  const [selected, setSelected] = useState<string | null>(null);
+  const [confirmBan, setConfirmBan] = useState(false);
+  const target = players.find((player) => player.id === selected);
+  const isHost = players.some((player) => player.id === you && player.isHost);
+  const closeConfirmation = () => {
+    setSelected(null);
+    setConfirmBan(false);
+  };
+  const moderate = (type: "remove" | "ban") => {
+    if (!target || disabled || !isHost) return;
+    onModerate?.({ type, playerId: target.id });
+    closeConfirmation();
+    setOpen(false);
+  };
   const panelId = useId();
   return (
     <>
@@ -86,13 +111,67 @@ export function ParticipantDrawer({
                     <span className="block text-xs font-normal">Host</span>
                   )}
                 </span>
-                <span className="text-xs text-zinc-600 dark:text-zinc-400">
+                <span className="flex shrink-0 items-center gap-3 text-xs text-zinc-600 dark:text-zinc-400">
                   {player.online ? "Online" : "Offline"}
+                  {isHost && !player.isHost && onModerate && (
+                    <button
+                      type="button"
+                      disabled={disabled}
+                      aria-label={`Remove ${player.name}`}
+                      className="min-h-11 px-2 font-bold text-red-700 underline focus-visible:outline-2 focus-visible:outline-blue-600 disabled:opacity-50 dark:text-red-400"
+                      onClick={() => {
+                        setSelected(player.id);
+                        setConfirmBan(false);
+                      }}
+                    >
+                      Remove
+                    </button>
+                  )}
                 </span>
               </li>
             ))}
           </ul>
         </DialogPanel>
+        <Alert
+          key={confirmBan ? "ban" : "remove"}
+          open={!!target && isHost}
+          onClose={closeConfirmation}
+          className="relative z-50"
+        >
+          <AlertTitle>
+            {confirmBan
+              ? "Are you sure?"
+              : `Remove ${target?.name ?? "player"}?`}
+          </AlertTitle>
+          <AlertDescription>
+            {confirmBan
+              ? `Ban ${target?.name} from this room? They will be removed and blocked from rejoining. There is no way to undo this.`
+              : `${target?.name} will be removed from the room and their current buzz cleared. Remove lets them join again. Ban blocks them for the rest of this room.`}
+          </AlertDescription>
+          <AlertActions>
+            <Button plain data-autofocus onClick={closeConfirmation}>
+              Cancel
+            </Button>
+            {!confirmBan && (
+              <Button
+                outline
+                disabled={disabled}
+                onClick={() => moderate("remove")}
+              >
+                Remove
+              </Button>
+            )}
+            <Button
+              color="red"
+              disabled={disabled}
+              onClick={() =>
+                confirmBan ? moderate("ban") : setConfirmBan(true)
+              }
+            >
+              {confirmBan ? "Ban player" : "Ban"}
+            </Button>
+          </AlertActions>
+        </Alert>
       </Dialog>
     </>
   );

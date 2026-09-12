@@ -5,6 +5,7 @@ import {
   applyCommand,
   createRoom,
   ensureLive,
+  ensureNotBanned,
   expiresAt,
   leaveRoom,
   snapshot,
@@ -123,6 +124,7 @@ export class BuzzerRoom extends DurableObject {
     try {
       const room = await this.live();
       const tokenHash = request.headers.get("x-bzzr-token-hash");
+      ensureNotBanned(room, tokenHash);
       const members = (state: RoomState) => [
         ...state.players,
         ...(state.spectators ?? []),
@@ -136,6 +138,7 @@ export class BuzzerRoom extends DurableObject {
           const body = await readJson(request);
           // Read the latest state after the non-storage await above.
           const current = await this.live();
+          ensureNotBanned(current, tokenHash);
           player = members(current).find((p) => p.tokenHash === tokenHash);
           if (!player) {
             const member = {
@@ -269,6 +272,22 @@ export class BuzzerRoom extends DurableObject {
         return;
       }
       if (next !== room) await this.save(next);
+      if (command.type === "remove" || command.type === "ban") {
+        for (const targetSocket of this.ctx.getWebSockets(command.playerId)) {
+          this.send(targetSocket, {
+            type: "removed",
+            banned: command.type === "ban",
+          });
+          try {
+            targetSocket.close(
+              command.type === "ban" ? 4007 : 4006,
+              command.type,
+            );
+          } catch {
+            /* already closed */
+          }
+        }
+      }
       // Even a duplicate receives confirmation; the domain does not write again.
       this.broadcast();
     } catch (error) {

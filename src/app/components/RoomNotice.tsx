@@ -6,12 +6,22 @@ export function RoomNotice({
   onRetry,
   roomCode,
 }: {
-  kind: "loading" | "closed" | "expired" | "error" | "not-found" | "left";
+  kind:
+    | "loading"
+    | "closed"
+    | "expired"
+    | "error"
+    | "not-found"
+    | "left"
+    | "removed"
+    | "banned";
   roomCode?: string;
   message?: string;
   onRetry?: () => void;
 }) {
   const title = {
+    removed: "You were removed from the room.",
+    banned: "You were banned from the room.",
     left: "You left the room.",
     loading: "Finding your room…",
     closed: "That’s a wrap.",
@@ -22,6 +32,9 @@ export function RoomNotice({
   const detail =
     message ??
     {
+      removed:
+        "The host removed your seat and current buzz. You can join again.",
+      banned: "The host banned you from this room. This cannot be undone.",
       left: "Your spot is free for someone else.",
       loading: "Getting your buzzer ready.",
       closed: "The host ended the room. Thanks for playing.",
@@ -44,7 +57,7 @@ export function RoomNotice({
       </p>
       {kind !== "loading" && (
         <div className="mt-8 flex justify-center gap-3">
-          {kind === "left" && roomCode && (
+          {(kind === "left" || kind === "removed") && roomCode && (
             <Button href={`/room/${roomCode}`} color="lime">
               Join again
             </Button>

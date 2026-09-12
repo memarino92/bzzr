@@ -38,6 +38,7 @@ tabs in one profile share identity.
 - Any player can open a spectator view in a second tab while continuing to play.
 - Leave room explicitly to free your seat and name; departing hosts pass hosting to the next player.
 - Host opens, resets, locks, and ends the room. The host can buzz too.
+- Host-only Remove links in the player drawer offer removal or an irreversible room ban with a second confirmation.
 - Server-assigned order, duplicate protection, and stale-round rejection.
 - Cookie-based reconnection, clear offline feedback, and keyboard controls.
 - One independent room authority with hibernating WebSockets and alarm cleanup.

@@ -11,6 +11,8 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 export const Loading: Story = {};
 export const Left: Story = { args: { kind: "left", roomCode: "ABC234" } };
+export const Removed: Story = { args: { kind: "removed", roomCode: "ABC234" } };
+export const Banned: Story = { args: { kind: "banned" } };
 export const Ended: Story = { args: { kind: "closed" } };
 export const Expired: Story = { args: { kind: "expired" } };
 export const NetworkError: Story = { args: { kind: "error", onRetry: fn() } };

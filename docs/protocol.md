@@ -103,3 +103,19 @@ Snapshots decide order; the client never guesses a position.
 
 Close code 4004 means room end/expiry, 1008 means command-rate policy, and 1009
 means oversized or binary messages. Policy failures expose a manual retry.
+
+## Host moderation
+
+Host sockets may send `{ "type": "remove", "playerId": "…" }` or
+`{ "type": "ban", "playerId": "…" }`. Targets must be another current player;
+round numbers do not apply. These commands use the existing authenticated,
+origin-checked, bounded WebSocket channel. A successful command persists first,
+then sends `{ "type": "removed", "banned": false }` (or `true`) to every target
+socket and broadcasts the updated roster and compacted buzz order to others.
+Close codes are 4006 for removal and 4007 for ban. Remaining players receive
+snapshots as acknowledgement; errors use the existing error message format.
+
+Banned capabilities receive HTTP 403 with code `BANNED` for all room endpoints,
+including player/spectator rejoining and explicit departure. Bans last until room
+cleanup and cannot be undone. Removal permits rejoining with the existing cookie.
+See [the moderation decision](decisions/0010-host-moderation.md) for identity limits.
