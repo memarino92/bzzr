@@ -76,6 +76,8 @@ test("theme remains switchable when browser storage is unavailable", async ({
   await page.getByRole("button", { name: "Create a room" }).click();
   await expect(page).toHaveURL(/\/room\/[A-Z2-9]{6}$/);
   const control = page.getByRole("switch", { name: "Dark mode", exact: true });
+  // Wait for the live room, rather than clicking the loading shell's toggle.
+  await expect(page.getByRole("button", { name: "Buzz in" })).toBeVisible();
   await control.click();
   await expect(control).toBeChecked();
   await expect(page.locator("body")).toHaveCSS("color-scheme", "dark");
