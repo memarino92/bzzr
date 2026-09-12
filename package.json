@@ -35,6 +35,7 @@
     "@headlessui/react": "2.2.10",
     "capnweb": "~0.10.0",
     "clsx": "2.1.1",
+    "qrcode.react": "4.2.0",
     "react": "19.2.8",
     "react-dom": "19.2.8",
     "react-server-dom-webpack": "19.2.8",

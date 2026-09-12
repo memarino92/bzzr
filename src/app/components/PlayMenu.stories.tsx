@@ -35,6 +35,42 @@ const open: Story["play"] = async ({ canvasElement }) => {
   );
 };
 export const Closed: Story = {};
+export const QrCode: Story = {
+  play: async (context) => {
+    await open(context);
+    await userEvent.click(
+      within(context.canvasElement).getByRole("button", {
+        name: "Open QR code",
+      }),
+    );
+    const body = within(context.canvasElement.ownerDocument.body);
+    await expect(
+      body.getByRole("dialog", { name: "Scan to join the room" }),
+    ).toBeVisible();
+    await expect(
+      body.getByRole("img", { name: "Room invitation QR code" }),
+    ).toBeVisible();
+    await expect(
+      body.getByText(window.location.origin + "/room/DEMO23"),
+    ).toBeVisible();
+  },
+};
+export const QrMobile: Story = {
+  ...QrCode,
+  globals: { viewport: { value: "mobile", isRotated: false } },
+};
+export const DismissQr: Story = {
+  play: async (context) => {
+    await QrCode.play!(context);
+    await userEvent.keyboard("{Escape}");
+    await expect(
+      within(context.canvasElement.ownerDocument.body).queryByRole("dialog"),
+    ).not.toBeInTheDocument();
+    await expect(
+      within(context.canvasElement).getByRole("button", { name: "Room menu" }),
+    ).toHaveFocus();
+  },
+};
 export const Player: Story = { play: open };
 export const Host: Story = { args: { onEnd: fn() }, play: open };
 export const HostOffline: Story = {
