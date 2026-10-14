@@ -61,7 +61,7 @@ it("reports caught API exceptions without reporting expected validation failures
       ...env,
       CREATE_LIMITER: {
         limit: async () => {
-          throw new Error("PRIVATE_FAILURE");
+          throw new Error("Rate limiter binding failed: token=PRIVATE_FAILURE");
         },
       },
     },
@@ -71,6 +71,7 @@ it("reports caught API exceptions without reporting expected validation failures
   await waitOnExecutionContext(ctx);
   expect(envelopes).toHaveLength(1);
   expect(envelopes[0]).toContain('"operation":"api"');
+  expect(envelopes[0]).toContain("Rate limiter binding failed:");
   expect(envelopes[0]).not.toContain("PRIVATE_FAILURE");
   expect(envelopes[0]).not.toContain("Private player");
 });
@@ -124,7 +125,7 @@ it("reports a caught WebSocket command failure after hibernation", async () => {
 it("flushes an unhandled Worker exception after the handler completes", async () => {
   const worker = instrumentWorker({
     fetch() {
-      throw new Error("PRIVATE_WORKER_PAYLOAD");
+      throw new Error("Server render failed: token=PRIVATE_WORKER_PAYLOAD");
     },
   });
   const ctx = createExecutionContext();
@@ -138,6 +139,7 @@ it("flushes an unhandled Worker exception after the handler completes", async ()
   await waitOnExecutionContext(ctx);
   expect(envelopes).toHaveLength(1);
   expect(envelopes[0]).toContain('"boundary":"worker"');
+  expect(envelopes[0]).toContain("Server render failed:");
   expect(envelopes[0]).not.toContain("PRIVATE");
   expect(envelopes[0]).not.toContain("ABC234");
 });

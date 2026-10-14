@@ -121,7 +121,7 @@ Source-map upload settings belong to the build process, not this file.
    To check basic browser ingestion in staging, execute
    `setTimeout(() => { throw new Error("bzzr telemetry smoke test"); }, 0)` in the
    browser developer console. Confirm the envelope POST succeeds and a browser
-   issue arrives. Its message is deliberately replaced by the privacy filter;
+   issue arrives with the original smoke-test message;
    a console-generated stack cannot prove source maps for an app bundle.
 3. In an internal staging deployment configured with separate Sentry projects,
    temporarily add controlled exceptions to the browser, Worker, and room command
@@ -130,8 +130,9 @@ Source-map upload settings belong to the build process, not this file.
    those exceptions before promoting the release. There is no public debug-crash
    endpoint in production.
 4. Inspect event JSON for excluded data. Confirm cookies, capability hashes, room
-   codes, names, snapshots, request bodies, raw error messages, and query strings
-   are absent. Try a `.js.map` URL for a client bundle: it must not serve a map.
+   codes, names, snapshots, request bodies, and query strings are absent. Confirm
+   useful diagnostic messages and exception types are preserved. Try a `.js.map`
+   URL for a client bundle: it must not serve a map.
 5. If no events arrive, check DSNs, environment filtering, project quotas, browser
    blockers, and the CSP/network panel. The app permits only the configured
    browser DSN's HTTPS origin in `connect-src`; do not add a wildcard.
@@ -144,14 +145,20 @@ delivery; those require the account checks above.
 
 ## Data policy and limitations
 
-Errors retain standard exception type, stack function/file/line/column, debug IDs,
-release, environment, and allowlisted boundary/operation tags. Exception messages
-are replaced with a fixed label because they can contain user input or capabilities.
-This sacrifices message detail; source maps and stacks identify the failing code.
-The filter rebuilds events rather than relying on a growing list of sensitive keys.
+Errors retain their diagnostic message, custom exception type, mechanism, stack
+function/file/line/column, debug IDs, release, environment, and boundary/operation
+tags. For example, `Cannot read properties of undefined (reading 'buzzes')` and
+`SQLITE_BUSY: database is locked` remain intact. Recognizable credential fields,
+bearer tokens, capabilities/hashes, cookie headers, and URL credentials/query strings
+are scrubbed within messages instead of replacing the whole message.
 
-Requests, URLs, cookies, headers, user identifiers, IP fields, React props/component
-context, source excerpts, extra context, and automatic breadcrumbs are omitted.
+HTTP method, sanitized request URL, User-Agent and selected browser/OS/runtime/device
+model/version context are retained for diagnosis. Room URL segments become `[room]`.
+Request bodies, cookies/authorization headers, user identifiers, IP fields, device
+names, React props/component context, source excerpts, arbitrary extra context,
+and automatic breadcrumbs are omitted. Do not interpolate private names, credentials
+or full payloads into exceptions: patterns cannot recognize arbitrary unlabeled
+private text. See [ADR 0012](decisions/0012-useful-error-diagnostics.md).
 Session tracking, Session Replay, application logs, and sampled tracing are off.
 Sentry still receives network connection metadata when browsers contact it directly;
 configure server-side IP retention/scrubbing and retention policy in Sentry as needed.

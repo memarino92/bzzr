@@ -20,9 +20,11 @@ it("delivers React errors using the real browser SDK without private context", a
   document.head.innerHTML =
     '<meta name="sentry-dsn" content="https://public@sentry.test/2"><meta name="sentry-environment" content="test">';
   const callbacks = initBrowserSentry();
-  const error = new Error("PRIVATE_PLAYER_NAME_AND_CAPABILITY");
+  const error = new TypeError(
+    "Cannot hydrate room: capability=PRIVATE_CAPABILITY",
+  );
   error.stack =
-    "Error: PRIVATE_PLAYER_NAME_AND_CAPABILITY\n    at renderRoom (https://bzzr.test/assets/client.js:10:2)";
+    "TypeError: Cannot hydrate room: capability=PRIVATE_CAPABILITY\n    at renderRoom (https://bzzr.test/assets/client.js:10:2)";
   callbacks.onUncaughtError!(error, {
     componentStack: "PRIVATE_COMPONENT_PROPS",
   });
@@ -30,5 +32,7 @@ it("delivers React errors using the real browser SDK without private context", a
   expect(requests).toHaveLength(1);
   expect(requests[0]).toContain('"boundary":"browser"');
   expect(requests[0]).toContain("renderRoom");
+  expect(requests[0]).toContain("Cannot hydrate room:");
+  expect(requests[0]).toContain('"type":"TypeError"');
   expect(requests[0]).not.toContain("PRIVATE");
 });
