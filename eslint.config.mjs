@@ -7,6 +7,7 @@ import globals from "globals";
 export default tseslint.config(
   {
     ignores: [
+      ".cache/**",
       "dist/**",
       "node_modules/**",
       ".wrangler/**",

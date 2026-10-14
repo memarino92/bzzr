@@ -7,5 +7,6 @@ coverage/
 playwright-report/
 test-results/
 .wrangler/
+.cache/
 src/app/components/catalyst/
 

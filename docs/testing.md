@@ -30,6 +30,14 @@ attachments after eviction, alarms/deleteAll, parallel joins at capacity, heartb
 auto-responses, command/connection bounds, and request throttling. They do not
 mock Durable Object storage. They never expose a test endpoint in production.
 
+Telemetry tests use the real browser SDK with fake delivery, plus real workerd
+Worker/room wrappers. Integration tests enable a synthetic Sentry DSN and intercept
+outbound fetches; no account or network access is needed. They check caught and
+uncaught capture, post-hibernation WebSocket errors, invocation flushing, and private
+event filtering. Separate tests check runtime meta tags and exact CSP permissions.
+Authenticated source-map uploads, account ingestion, and alert delivery require
+the manual checks in [the Sentry runbook](sentry.md).
+
 E2E uses the built RedwoodSDK app through Vite preview. Three independent browser
 contexts represent host and two guests. Tests exercise links, code entry, cookies,
 hydration, CSP, order, reset, lock, reload, offline/online recovery, keyboard use,

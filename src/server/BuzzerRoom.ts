@@ -1,4 +1,6 @@
 import { DurableObject } from "cloudflare:workers";
+import { instrumentDurableObjectWithSentry } from "@sentry/cloudflare";
+import { reportServerError, serverSentryOptions } from "./sentry";
 import {
   addPlayer,
   addSpectator,
@@ -27,7 +29,7 @@ interface Attachment {
 }
 
 /** One coordination authority per room. No global directory or running timers. */
-export class BuzzerRoom extends DurableObject {
+class BuzzerRoomBase extends DurableObject<Env> {
   private room: RoomState | undefined;
 
   constructor(ctx: DurableObjectState, env: Env) {
@@ -227,6 +229,7 @@ export class BuzzerRoom extends DurableObject {
       }
       throw new RoomError("NOT_FOUND", "That endpoint does not exist.", 404);
     } catch (error) {
+      reportServerError(error, "room-http");
       return jsonError(error);
     }
   }
@@ -292,6 +295,7 @@ export class BuzzerRoom extends DurableObject {
       this.broadcast();
     } catch (error) {
       const known = error instanceof RoomError;
+      reportServerError(error, "room-command");
       this.send(ws, {
         type: "error",
         code: known ? error.code : "INTERNAL_ERROR",
@@ -338,3 +342,9 @@ export class BuzzerRoom extends DurableObject {
     await this.ctx.storage.deleteAll();
   }
 }
+
+export const BuzzerRoom = instrumentDurableObjectWithSentry(
+  (env: Env) => serverSentryOptions(env, "room"),
+  BuzzerRoomBase,
+);
+export type BuzzerRoom = InstanceType<typeof BuzzerRoom>;

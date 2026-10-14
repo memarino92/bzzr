@@ -20,6 +20,11 @@ No D1 database, KV namespace, R2 bucket, or secret is required. The ROOMS bindin
 and rate-limit bindings are declared in wrangler.jsonc. The chosen compatibility
 date, 2026-08-01, is supported by both pinned production and test runtimes.
 
+Optional Sentry reporting needs runtime DSNs and production environment settings;
+source-map uploads need a separate build-only auth token. Follow the detailed
+[Sentry setup runbook](sentry.md) before enabling reporting. `keep_vars: true`
+preserves dashboard text variables across deploys; no credentials live in Wrangler.
+
 ## Connected build settings
 
 Use the repository root, Node 24+, and pnpm 11.19.0. The install command is

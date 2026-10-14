@@ -59,6 +59,11 @@ setAlarm is a billed write.
 
 ## Observe and respond
 
+Optional Sentry instrumentation captures browser, Worker, and room exceptions.
+Follow [Sentry setup and operations](sentry.md) for environment variables, source-map
+uploads, manual notifications, privacy policy, verification, and disabling/rotation.
+Sentry retention is independent of room expiry and Cloudflare logs.
+
 Wrangler enables observability with 10% head sampling. Use Cloudflare request,
 error, CPU/duration, WebSocket, and storage metrics. Application error logs use a
 fixed event name and exclude request bodies and credentials. Platform invocation

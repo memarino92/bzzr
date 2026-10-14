@@ -15,6 +15,7 @@ import {
   sessionCookie,
 } from "./http";
 import type { RoomBindings } from "./env";
+import { reportServerError } from "./sentry";
 
 function randomCode(): string {
   // The alphabet has exactly 32 symbols, so masking produces no modulo bias.
@@ -133,6 +134,7 @@ export async function handleApi(
       outgoing.headers.set("Set-Cookie", sessionCookie(request, code, "", 0));
     return outgoing;
   } catch (error) {
+    reportServerError(error, "api");
     // Request bodies and capabilities are intentionally excluded from logs.
     if (!(error instanceof RoomError)) console.error("room_api_failed");
     return jsonError(error);

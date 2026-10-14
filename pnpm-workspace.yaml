@@ -5,3 +5,4 @@ allowBuilds:
   workerd: true
   sharp: true
   "@tailwindcss/oxide": true
+  "@sentry/cli": true
