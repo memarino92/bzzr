@@ -4,6 +4,8 @@ Changes follow Conventional Commits. This log records user-visible milestones.
 
 ## 1.0.0 — Unreleased
 
+- Preserve actionable Sentry error messages, custom types, and safe request/runtime diagnostics while redacting credential values.
+
 - Add optional Sentry error reporting for browser, Worker, and room Durable Objects, with private event filtering, source maps, and an operator setup runbook.
 
 - Add explicit leave with immediate seat reuse, shared-tab sign-out, and host handoff.

@@ -1,7 +1,88 @@
 import { describe, expect, it } from "vitest";
-import { privateError, publicDsn } from "../../src/telemetry/privacy";
+import {
+  diagnosticText,
+  privateError,
+  publicDsn,
+} from "../../src/telemetry/privacy";
 
 describe("telemetry privacy boundary", () => {
+  it.each([
+    ["TypeError", "Cannot read properties of undefined (reading 'buzzes')"],
+    ["D1Error", "SQLITE_BUSY: database is locked while persisting the round"],
+    ["RoomPersistenceError", "Storage write failed after transaction rollback"],
+  ])("preserves useful %s diagnostics", (type, value) => {
+    const event = privateError({
+      type: undefined,
+      message: value,
+      exception: {
+        values: [
+          {
+            type,
+            value,
+            mechanism: { type: "auto.http.cloudflare", handled: false },
+          },
+        ],
+      },
+      contexts: {
+        browser: { name: "Chrome", version: "130.0" },
+        runtime: { name: "workerd", version: "1.0" },
+        react: { props: { name: "Alex" } },
+      },
+    });
+    expect(event.message).toBe(value);
+    expect(event.exception!.values![0]).toMatchObject({
+      type,
+      value,
+      mechanism: { type: "auto.http.cloudflare", handled: false },
+    });
+    expect(event.contexts).toEqual({
+      browser: { name: "Chrome", version: "130.0" },
+      runtime: { name: "workerd", version: "1.0" },
+    });
+  });
+
+  it("scrubs sensitive values without erasing the surrounding failure", () => {
+    const text = diagnosticText(
+      'Storage write failed: tokenHash="PRIVATE_HASH", capability=PRIVATE_TOKEN; playerName="Alex"; request=https://bzzr.test/room/ABC234?token=PRIVATE_QUERY',
+    );
+    expect(text).toContain("Storage write failed:");
+    expect(text).toContain("https://bzzr.test/room/[room]");
+    for (const secret of [
+      "PRIVATE_HASH",
+      "PRIVATE_TOKEN",
+      "Alex",
+      "PRIVATE_QUERY",
+      "ABC234",
+    ])
+      expect(text).not.toContain(secret);
+    expect(
+      diagnosticText("Cannot read properties of undefined (reading 'name')"),
+    ).toBe("Cannot read properties of undefined (reading 'name')");
+    expect(diagnosticText(`Hash mismatch: ${"a".repeat(64)}`)).toBe(
+      "Hash mismatch: [Filtered hash]",
+    );
+  });
+
+  it("retains request diagnostics without cookies, credentials, room IDs or query strings", () => {
+    const event = privateError({
+      type: undefined,
+      request: {
+        method: "POST",
+        url: "https://user:password@bzzr.test/api/rooms/ABC234/join?capability=SECRET",
+        headers: {
+          "User-Agent": "Mozilla/5.0 Chrome/130.0",
+          Cookie: "private-cookie",
+          Authorization: "Bearer private-key",
+        },
+        data: { name: "Alex" },
+      },
+    });
+    expect(event.request).toEqual({
+      method: "POST",
+      url: "https://bzzr.test/api/rooms/[room]/join",
+      headers: { "User-Agent": "Mozilla/5.0 Chrome/130.0" },
+    });
+  });
   it("accepts public HTTPS DSNs and disables missing, malformed or secret DSNs", () => {
     expect(publicDsn("https://public@o1.ingest.sentry.io/42")).toBe(
       "https://public@o1.ingest.sentry.io/42",
@@ -26,7 +107,7 @@ describe("telemetry privacy boundary", () => {
       event_id: "123",
       release: "abc123",
       environment: "test",
-      message: secret,
+      message: `Storage write failed: capability=${secret}`,
       request: {
         url: `https://bzzr.app/room/ABC234?token=${secret}`,
         headers: { Cookie: secret },
@@ -41,7 +122,7 @@ describe("telemetry privacy boundary", () => {
         values: [
           {
             type: "Error",
-            value: secret,
+            value: `Storage write failed: capability=${secret}`,
             mechanism: { type: "generic", handled: true, data: { secret } },
             stacktrace: {
               frames: [
