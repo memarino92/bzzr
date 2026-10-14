@@ -13,6 +13,7 @@ Keep accepted records stable; add a superseding record when the choice changes.
 8. [Spectator views belong to tabs](0008-spectator-tabs.md)
 9. [Explicit room departure](0009-explicit-departure.md)
 10. [Host removal and room bans](0010-host-moderation.md)
+11. [Error monitoring across execution boundaries](0011-error-monitoring.md)
 
 For a new record, use the next number and include status, date, context, decision,
 consequences, and relevant primary sources. Link it here and from affected docs.

@@ -82,6 +82,11 @@ latency. Client clocks and timestamps are never used as tie-breakers.
 
 ## Deployment and evolution
 
+Optional error telemetry instruments the browser, Worker, and room Durable Objects
+separately. Domain rules do not depend on Sentry. Captured events exclude room/user
+payloads and credentials; reporting never delays a game acknowledgment. See
+[ADR 0011](decisions/0011-error-monitoring.md) and the [setup runbook](sentry.md).
+
 Wrangler v1 preserves the old starter's SessionDurableObject migration; v2 adds
 BuzzerRoom. The legacy class remains exported but does not issue new sessions.
 Do not rewrite migration history. See [deployment](deployment.md).

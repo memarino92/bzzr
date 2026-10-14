@@ -1,11 +1,12 @@
 import { handleApi } from "../../src/server/api";
 import type { RoomBindings } from "../../src/server/env";
+import { instrumentWorker } from "../../src/server/sentry";
 
 export { BuzzerRoom } from "../../src/server/BuzzerRoom";
 export { SessionDurableObject } from "../../src/legacy/SessionDurableObject";
 
 // Tests exercise the production adapter without loading RSC transforms.
 // This entry point is never included in the production Worker.
-export default {
+export default instrumentWorker({
   fetch: (request: Request, env: RoomBindings) => handleApi(request, env),
-};
+});

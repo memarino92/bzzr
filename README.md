@@ -92,6 +92,7 @@ presentation are separate, so each can be tested where its guarantees live.
 | Platform, lifecycle, auth, testing tradeoffs | [Decision records](docs/decisions/README.md)                                                |
 | Cloudflare setup, release and rollback       | [Deployment](docs/deployment.md)                                                            |
 | Resource limits, cost and incident response  | [Operations](docs/operations.md)                                                            |
+| Optional error reporting and alerts          | [Sentry setup](docs/sentry.md)                                                              |
 | Test layers and artifacts                    | [Testing](docs/testing.md)                                                                  |
 | Human and AI contributions                   | [Contributing](CONTRIBUTING.md), [AGENTS.md](AGENTS.md), [AI workflow](docs/ai-workflow.md) |
 | Scope and future work                        | [Roadmap](docs/roadmap.md), [Changelog](CHANGELOG.md)                                       |

@@ -1,0 +1,6 @@
+# Copy to .dev.vars only when testing delivery to a development Sentry project.
+# Both DSNs are public ingestion addresses, not Sentry API tokens.
+SENTRY_DSN=
+SENTRY_BROWSER_DSN=
+SENTRY_ENVIRONMENT=development
+SENTRY_RELEASE=

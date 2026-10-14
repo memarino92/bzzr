@@ -1,4 +1,6 @@
 import type { RouteMiddleware } from "rwsdk/router";
+import { env } from "cloudflare:workers";
+import { publicDsn } from "../telemetry/privacy";
 
 export const setCommonHeaders =
   (): RouteMiddleware =>
@@ -12,10 +14,12 @@ export const setCommonHeaders =
     );
     response.headers.set("Cache-Control", "no-store");
     if (!import.meta.env.VITE_IS_DEV_SERVER) {
+      const dsn = publicDsn(env.SENTRY_BROWSER_DSN);
+      const telemetryOrigin = dsn ? ` ${new URL(dsn).origin}` : "";
       response.headers.set("Strict-Transport-Security", "max-age=31536000");
       response.headers.set(
         "Content-Security-Policy",
-        `default-src 'self'; script-src 'self' 'nonce-${nonce}'; style-src 'self' 'unsafe-inline'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; object-src 'none'; form-action 'self'`,
+        `default-src 'self'; script-src 'self' 'nonce-${nonce}'; style-src 'self' 'unsafe-inline'; connect-src 'self'${telemetryOrigin}; frame-ancestors 'none'; base-uri 'self'; object-src 'none'; form-action 'self'`,
       );
     }
   };

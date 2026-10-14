@@ -1,4 +1,7 @@
 import type { DocumentProps } from "rwsdk/router";
+import { env } from "cloudflare:workers";
+import { publicDsn } from "../telemetry/privacy";
+import { buildRelease } from "../telemetry/release";
 import stylesheet from "./styles.css?url";
 import { themeBootstrapScript } from "./lib/theme";
 
@@ -7,6 +10,15 @@ export function Document({ children, rw }: DocumentProps) {
     <html lang="en" suppressHydrationWarning>
       <head>
         <meta charSet="utf-8" />
+        <meta
+          name="sentry-dsn"
+          content={publicDsn(env.SENTRY_BROWSER_DSN) ?? ""}
+        />
+        <meta name="sentry-environment" content={env.SENTRY_ENVIRONMENT} />
+        <meta
+          name="sentry-release"
+          content={env.SENTRY_RELEASE || buildRelease}
+        />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <script
           nonce={rw.nonce}

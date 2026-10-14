@@ -9,50 +9,53 @@ import { RoomNotice } from "./app/components/RoomNotice";
 import { normalizeCode } from "./domain/protocol";
 import { setCommonHeaders } from "./app/headers";
 import { handleApi } from "./server/api";
+import { instrumentWorker } from "./server/sentry";
 
 export { SessionDurableObject } from "./legacy/SessionDurableObject";
 export { BuzzerRoom } from "./server/BuzzerRoom";
 
-export default defineApp([
-  setCommonHeaders(),
-  ({ request }) => {
-    if (new URL(request.url).pathname.startsWith("/api/"))
-      return handleApi(request, env);
-  },
-  route("/health", () => Response.json({ status: "ok" })),
-  render(Document, [
-    route("/", Home),
-    route("/room/:code/spectate", ({ params, response }) => {
-      try {
-        return <RoomClient code={normalizeCode(params.code)} spectating />;
-      } catch {
+export default instrumentWorker(
+  defineApp([
+    setCommonHeaders(),
+    ({ request }) => {
+      if (new URL(request.url).pathname.startsWith("/api/"))
+        return handleApi(request, env);
+    },
+    route("/health", () => Response.json({ status: "ok" })),
+    render(Document, [
+      route("/", Home),
+      route("/room/:code/spectate", ({ params, response }) => {
+        try {
+          return <RoomClient code={normalizeCode(params.code)} spectating />;
+        } catch {
+          response.status = 404;
+          return (
+            <AppShell>
+              <RoomNotice kind="not-found" />
+            </AppShell>
+          );
+        }
+      }),
+      route("/room/:code", ({ params, response }) => {
+        try {
+          return <RoomClient code={normalizeCode(params.code)} />;
+        } catch {
+          response.status = 404;
+          return (
+            <AppShell>
+              <RoomNotice kind="not-found" />
+            </AppShell>
+          );
+        }
+      }),
+      route("*", ({ response }) => {
         response.status = 404;
         return (
           <AppShell>
             <RoomNotice kind="not-found" />
           </AppShell>
         );
-      }
-    }),
-    route("/room/:code", ({ params, response }) => {
-      try {
-        return <RoomClient code={normalizeCode(params.code)} />;
-      } catch {
-        response.status = 404;
-        return (
-          <AppShell>
-            <RoomNotice kind="not-found" />
-          </AppShell>
-        );
-      }
-    }),
-    route("*", ({ response }) => {
-      response.status = 404;
-      return (
-        <AppShell>
-          <RoomNotice kind="not-found" />
-        </AppShell>
-      );
-    }),
+      }),
+    ]),
   ]),
-]);
+);

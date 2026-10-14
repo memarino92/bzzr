@@ -7,9 +7,16 @@ export default defineConfig({
       main: "./tests/integration/worker.ts",
       wrangler: { configPath: "./wrangler.jsonc" },
       remoteBindings: false,
+      miniflare: {
+        bindings: {
+          SENTRY_DSN: "https://public@sentry.test/1",
+          SENTRY_ENVIRONMENT: "test",
+        },
+      },
     }),
   ],
   test: {
+    setupFiles: ["./tests/integration/setup.ts"],
     include: ["tests/integration/**/*.test.ts"],
     testTimeout: 15_000,
     hookTimeout: 15_000,

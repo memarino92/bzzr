@@ -10,6 +10,9 @@ pnpm-debug.log*
 # Environment variables
 .env
 .dev.vars
+.dev.vars.*
+!.dev.vars.example
+.env.sentry-build-plugin
 
 # Vite build output
 dist
